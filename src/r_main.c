@@ -65,7 +65,8 @@ void main(void)
     /* Start user code. Do not edit comment generated here */
     while (1U)
     {
-    	MainState();
+    	//Should be add when created new system
+    	SystemRunTimerState();
     }
     /* End user code. Do not edit comment generated here */
 }
@@ -79,8 +80,9 @@ void main(void)
 void R_MAIN_UserInit(void)
 {
     /* Start user code. Do not edit comment generated here */
+    //Should be add when created new system
+    SystemInitState();
     EI();
-    InitState();
     /* End user code. Do not edit comment generated here */
 }
 

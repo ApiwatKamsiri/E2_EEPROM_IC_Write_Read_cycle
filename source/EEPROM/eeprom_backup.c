@@ -1,6 +1,6 @@
 /***********************************************************************************************************************
-* Function Name	: system.c
-* Description  	: This function implements system function.
+* Function Name	: eeprom_backup.c
+* Description  	: This function implements eeprom backup function.
 * author    	: Apiwat Kamsiri
 * Create date 	: 29-05-2026
 ***********************************************************************************************************************/
@@ -8,62 +8,109 @@
 /***********************************************************************************************************************
 Include
 ***********************************************************************************************************************/
-#include "system.h"
-
+#include <EEPROM\eeprom_backup.h>
+#include "..\\dev\timer.h"
 
 /***********************************************************************************************************************
 Define function
 ***********************************************************************************************************************/
+//Global variable
+EepromProcessStruct_t processCurrent;
+
 
 
 /***********************************************************************************************************************
-Initial state
+Initial EEPROM backup function
 ***********************************************************************************************************************/
-void SystemInitState(void)
+void EepromBackup_Init(void)
 {
-	SysTimer_Init();	//Initial hardware timer
+	processCurrent.process = EEPROM_PROCESS_NONE;
+
+
 }
 
+
 /***********************************************************************************************************************
-System loop state
+EEPROM backup Process
 ***********************************************************************************************************************/
-void SystemRunTimerState(void)
+void EEPROMBackupStateHandler(void)
 {
 	SysTimer_Channel_1ms activeTimer = SysTimer_GetActiveTimer();
 
 	switch (activeTimer)
 	    {
-	        case SYS_TIMER_10MS:
-					MainState();
+			case SYS_TIMER_10MS:
+					EEPROM10MsTask();
 					SysTimer_Set(SYS_TIMER_10MS, 10);
+				break;
+	        case SYS_TIMER_20MS:
+					EEPROM20MsTask();
+					SysTimer_Set(SYS_TIMER_20MS, 20);
 	            break;
+
+	        case SYS_TIMER_1SEC:
+					EEPROM1sTask();
+					SysTimer_Set(SYS_TIMER_1SEC, 1000);
+	            break;
+
+	        case SYS_TIMER_1MIN:
+					EEPROM1MINTask();
+					SysTimer_Set(SYS_TIMER_1MIN, 60000);
+	            break;
+
 	        default:
-	        		SystemRunTimerStateDefault(activeTimer);
+	        		EEPROMBackupStateDefault(activeTimer);
 	            break;
 	    }
 }
 
 /***********************************************************************************************************************
-System loop state default
+EEPROM backup Process Default
 ***********************************************************************************************************************/
-void SystemRunTimerStateDefault(SysTimer_Channel_1ms activeTimer)
+void EEPROMBackupStateDefault(SysTimer_Channel_1ms activeTimer)
 {
 	switch (activeTimer)
 	    {
-	        case SYS_TIMER_10MS:
-	        		MainState();
-	            	SysTimer_Set(SYS_TIMER_10MS, 10);
+			case SYS_TIMER_10MS:
+					EEPROM10MsTask();
+					SysTimer_Set(SYS_TIMER_10MS, 10);
+				break;
+
+	        case SYS_TIMER_20MS:
+	        		EEPROM20MsTask();
+	            	SysTimer_Set(SYS_TIMER_20MS, 20);
+	            break;
+
+	        case SYS_TIMER_1SEC:
+	        		EEPROM1sTask();
+	            	SysTimer_Set(SYS_TIMER_1SEC, 1000);
+	            break;
+
+	        case SYS_TIMER_1MIN:
+	        		EEPROM1MINTask();
+	            	SysTimer_Set(SYS_TIMER_1MIN, 60000);
 	            break;
 	        default:
 	            break;
 	    }
 }
 
-
 /***********************************************************************************************************************
-Main loop state
+EEPROM timer task
 ***********************************************************************************************************************/
-void MainState(void)
+static void EEPROM10MsTask(void)
 {
-	EEPROMBackupStateHandler();
+	;
+}
+static void EEPROM20MsTask(void)
+{
+	;
+}
+static void EEPROM1sTask(void)
+{
+	;
+}
+static void EEPROM1MINTask(void)
+{
+	;
 }

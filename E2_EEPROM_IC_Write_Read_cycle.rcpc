@@ -8,6 +8,10 @@
   <Project Name="E2_EEPROM_IC_Write_Read_cycle" Type="Application">
     <Files>
       <Path>r_option_cc.txt</Path>
+      <Category Name="dev">
+        <Path>dev\timer.c</Path>
+        <Path>dev\timer.h</Path>
+      </Category>
       <Category Name="generate">
         <Path>generate\cstart.asm</Path>
         <Path>generate\iodefine.h</Path>
@@ -16,6 +20,10 @@
       <Category Name="source">
         <Path>source\system.c</Path>
         <Path>source\system.h</Path>
+        <Category Name="EEPROM">
+          <Path>source\EEPROM\eeprom_backup.c</Path>
+          <Path>source\EEPROM\eeprom_backup.h</Path>
+        </Category>
       </Category>
       <Category Name="src">
         <Path>src\r_cg_cgc.c</Path>
@@ -100,6 +108,8 @@
         <LinkOrder>
           <Path>HardwareDebug\cstart.obj</Path>
           <Path>HardwareDebug\stkinit.obj</Path>
+          <Path>HardwareDebug\timer.obj</Path>
+          <Path>HardwareDebug\eeprom_backup.obj</Path>
           <Path>HardwareDebug\system.obj</Path>
           <Path>HardwareDebug\r_cg_cgc.obj</Path>
           <Path>HardwareDebug\r_cg_cgc_user.obj</Path>
@@ -189,6 +199,8 @@
           <Path>Debug\r_systeminit.obj</Path>
           <Path>Debug\E2_EEPROM_IC_Write_Read_cycle.lib</Path>
         </LinkOrder>
+        <NoTargetFile Target="dev\timer.c"/>
+        <NoTargetFile Target="source\EEPROM\eeprom_backup.c"/>
         <NoTargetFile Target="source\system.c"/>
         <CommonOptions>
           <IncludePathForC>"${ProjDirPath}\generate"</IncludePathForC>
@@ -259,6 +271,8 @@
           <Path>Release\r_systeminit.obj</Path>
           <Path>Release\E2_EEPROM_IC_Write_Read_cycle.lib</Path>
         </LinkOrder>
+        <NoTargetFile Target="dev\timer.c"/>
+        <NoTargetFile Target="source\EEPROM\eeprom_backup.c"/>
         <NoTargetFile Target="source\system.c"/>
         <CommonOptions>
           <IncludePathForC>"${ProjDirPath}\generate"</IncludePathForC>

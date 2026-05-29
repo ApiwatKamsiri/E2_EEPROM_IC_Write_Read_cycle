@@ -57,6 +57,7 @@ Global variables and functions
 static void __near r_tau0_channel4_interrupt(void)
 {
     /* Start user code. Do not edit comment generated here */
+	Timer_Hardware_ISR();
     /* End user code. Do not edit comment generated here */
 }
 
