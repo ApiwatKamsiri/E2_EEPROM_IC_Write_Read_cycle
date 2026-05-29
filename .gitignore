@@ -1,0 +1,32 @@
+#For IAR
+*.pbi
+*.xcl
+*.pbd
+*.dnx
+*.browse
+*.linf
+*.crun
+*.dbgdt
+*.o
+*.map
+*.hex
+*.out
+*.7z
+*.i
+*.dep
+*.sim
+*.bak
+*.rsp
+
+#For E2 studio
+.metadata/
+RemoteSystemsTempFiles/
+.recommenders/
+
+#For E2 studio debug and release
+Debug/
+Release/
+HardwareDebug/
+
+# Allow .bat only inside built/scripts
+!built/scripts/*.bat
