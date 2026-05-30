@@ -54,7 +54,7 @@
         <CompileOptions>
           <Option>-cpu=S2</Option>
           <Option>-c</Option>
-          <Option>-dev="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-dev="E:/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-I "${ProjDirPath}\generate"</Option>
           <Option>-I "${ProjDirPath}\src"</Option>
           <Option>-I "${ProjDirPath}\source"</Option>
@@ -67,13 +67,13 @@
         <AssembleOptions>
           <Option>-cpu=S2</Option>
           <Option>-c</Option>
-          <Option>-dev="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-dev="E:/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-character_set=utf8</Option>
           <Option>-g</Option>
           <Option>-o "${ProjDirPath}\${ConfigName}"</Option>
         </AssembleOptions>
         <LinkOptions>
-          <Option>-device="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-device="E:/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-list</Option>
           <Option>-show=symbol</Option>
           <Option>-nooptimize</Option>
@@ -137,7 +137,7 @@
         <CompileOptions>
           <Option>-cpu=S2</Option>
           <Option>-c</Option>
-          <Option>-dev="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-dev="E:/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-I "${ProjDirPath}\generate"</Option>
           <Option>-I "${ProjDirPath}\src"</Option>
           <Option>-character_set=utf8</Option>
@@ -148,13 +148,13 @@
         <AssembleOptions>
           <Option>-cpu=S2</Option>
           <Option>-c</Option>
-          <Option>-dev="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-dev="E:/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-character_set=utf8</Option>
           <Option>-g</Option>
           <Option>-o "${ProjDirPath}\${ConfigName}"</Option>
         </AssembleOptions>
         <LinkOptions>
-          <Option>-device="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-device="E:/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-list</Option>
           <Option>-show=symbol</Option>
           <Option>-nooptimize</Option>
@@ -212,7 +212,7 @@
         <CompileOptions>
           <Option>-cpu=S2</Option>
           <Option>-c</Option>
-          <Option>-dev="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-dev="E:/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-I "${ProjDirPath}\generate"</Option>
           <Option>-I "${ProjDirPath}\src"</Option>
           <Option>-character_set=utf8</Option>
@@ -222,12 +222,12 @@
         <AssembleOptions>
           <Option>-cpu=S2</Option>
           <Option>-c</Option>
-          <Option>-dev="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-dev="E:/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-character_set=utf8</Option>
           <Option>-o "${ProjDirPath}\${ConfigName}"</Option>
         </AssembleOptions>
         <LinkOptions>
-          <Option>-device="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-device="E:/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-list</Option>
           <Option>-show=symbol</Option>
           <Option>-nooptimize</Option>

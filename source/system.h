@@ -16,7 +16,21 @@ Include function
 //Global variable
 #include "r_cg_macrodriver.h"
 
+/***********************************************************************************************************************
+Typedef struc function
+***********************************************************************************************************************/
+typedef struct {
+	SysTimer_type *pTimer;
+} SysDev_type;
 
+typedef struct {
+	EepromProcessStruct_t *pEep;
+} SysProcess_type;
+
+typedef struct {
+    SysDev_type SysDev;
+    SysProcess_type SysProcess;
+} System_Registry_t;
 
 /***********************************************************************************************************************
 Define function
@@ -29,5 +43,7 @@ extern void SystemRunTimerStateDefault(SysTimer_Channel_1ms activeTimer);
 extern void SystemInitState(void);
 extern void SystemRunTimerState(void);
 extern void MainState(void);
+
+extern System_Registry_t *SysProc;
 
 #endif

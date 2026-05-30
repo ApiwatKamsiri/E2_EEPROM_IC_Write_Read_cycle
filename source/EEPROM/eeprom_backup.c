@@ -25,8 +25,6 @@ Initial EEPROM backup function
 void EepromBackup_Init(void)
 {
 	processCurrent.process = EEPROM_PROCESS_NONE;
-
-
 }
 
 

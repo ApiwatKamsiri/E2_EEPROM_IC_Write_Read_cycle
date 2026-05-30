@@ -23,7 +23,7 @@
 * Device(s)    : R5F101PH
 * Tool-Chain   : CCRL
 * Description  : This file implements device driver for TAU module.
-* Creation Date: 29/05/2026
+* Creation Date: 5/30/2026
 ***********************************************************************************************************************/
 
 /***********************************************************************************************************************
@@ -57,6 +57,7 @@ Global variables and functions
 static void __near r_tau0_channel4_interrupt(void)
 {
     /* Start user code. Do not edit comment generated here */
+	//Should be add when created new system
 	Timer_Hardware_ISR();
     /* End user code. Do not edit comment generated here */
 }

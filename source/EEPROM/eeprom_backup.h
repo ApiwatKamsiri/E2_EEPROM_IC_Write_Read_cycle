@@ -33,6 +33,9 @@ typedef struct {
 /***********************************************************************************************************************
 Define function
 ***********************************************************************************************************************/
+//Global variable
+extern EepromProcessStruct_t processCurrent;
+
 void EepromBackup_Init(void);
 void EEPROMBackupStateHandler(void);
 void EEPROMBackupStateDefault(SysTimer_Channel_1ms activeTimer);
@@ -41,6 +44,7 @@ static void EEPROM10MsTask(void);
 static void EEPROM20MsTask(void);
 static void EEPROM1sTask(void);
 static void EEPROM1MINTask(void);
+
 
 
 #endif
