@@ -1,12 +1,11 @@
 /***********************************************************************************************************************
-* Function Name	: timer.h
-* Description  	: This function implements timer function.
+* Function Name	: i2c.h
+* Description  	: This function implements i2c communication function.
 * author    	: Apiwat Kamsiri
 * Create date 	: 29-05-2026
 ***********************************************************************************************************************/
-
-#ifndef TIMER_H
-#define TIMER_H
+#ifndef I2C_H
+#define I2C_H
 
 /***********************************************************************************************************************
 Include function
@@ -18,42 +17,36 @@ Include function
 typedef counting function
 ***********************************************************************************************************************/
 typedef enum {
-    SYS_TIMER_1MS = 0,
-    SYS_TIMER_10MS,
-    SYS_TIMER_20MS,
-    SYS_TIMER_100MS,
-    SYS_TIMER_1SEC,
-    SYS_TIMER_1MIN,
-    SYS_TIMER_1HOUR
-} SysTimer_Channel_1ms;
-
-typedef struct {
-	uint32_t counter;
-    uint32_t reload;
-    uint8_t  isTimeout;
-} SysTimer_1ms;
+    I2C_STATUS_IDLE,
+	I2C_STATUS_BUSY_SEND,
+    I2C_STATUS_BUSY_SENDFORREAD,
+	I2C_STATUS_BUSY_RECEIVE,
+    I2C_STATUS_ERROR
+} I2C_Status_t;
 
 typedef struct
 {
-	SysTimer_1ms periodic1Ms;
-	SysTimer_1ms periodic10Ms;
-	SysTimer_1ms periodic20Ms;
-	SysTimer_1ms periodic100Ms;
-	SysTimer_1ms periodic1Sec;
-	SysTimer_1ms periodic1Min;
-	SysTimer_1ms periodic1Hour;
-} SysTimer_type;
+	I2C_Status_t status;
+	uint8_t      *buffer;
+	uint8_t      slave_addr;
+	uint16_t     length;
+	uint16_t     current_offset;
+} SysI2C_type;
+
 
 /***********************************************************************************************************************
 Define function
 ***********************************************************************************************************************/
 //Global variable
-extern SysTimer_type TimerProcSys;
+extern SysI2C_type I2CProcSys;
 
-extern void SysTimer_Init(void);
-extern void SysTimer_Set(SysTimer_Channel_1ms channel, uint32_t durationMs);
-extern void Timer_Hardware_ISR(void);
-extern SysTimer_Channel_1ms SysTimer_GetActiveTimer(void);
+extern void SysI2C_Init(void);
+extern void SysI2C_Dev(void);
+extern void I2C_Hardware_ISR(void);
+extern void I2C_Hardware_Error_ISR(void);
+extern void SysI2C_Dev_Write(uint8_t slave_addr, uint16_t mem_addr, uint8_t *data, uint16_t len);
+extern void SysI2C_Dev_Read(uint8_t slave_addr, uint16_t mem_addr, uint8_t *data, uint16_t len);
+extern I2C_Status_t SysI2C_Dev_GetStatus(void);
 
 
 #endif

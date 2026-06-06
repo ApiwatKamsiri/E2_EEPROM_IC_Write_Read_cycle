@@ -32,6 +32,7 @@ Includes
 #include "r_cg_macrodriver.h"
 #include "r_cg_serial.h"
 /* Start user code for include. Do not edit comment generated here */
+#include "..\\dev\i2c.h"
 /* End user code. Do not edit comment generated here */
 #include "r_cg_userdefine.h"
 
@@ -179,6 +180,8 @@ static void iica0_master_handler(void)
 static void r_iica0_callback_master_error(MD_STATUS flag)
 {
     /* Start user code. Do not edit comment generated here */
+    //Should be add when created new system
+    I2C_Hardware_Error_ISR();
     /* End user code. Do not edit comment generated here */
 }
 
@@ -192,6 +195,8 @@ static void r_iica0_callback_master_receiveend(void)
 {
     SPT0 = 1U;
     /* Start user code. Do not edit comment generated here */
+    //Should be add when created new system
+    I2C_Hardware_ISR();
     /* End user code. Do not edit comment generated here */
 }
 
@@ -205,6 +210,8 @@ static void r_iica0_callback_master_sendend(void)
 {
     SPT0 = 1U;
     /* Start user code. Do not edit comment generated here */
+    //Should be add when created new system
+    I2C_Hardware_ISR();
     /* End user code. Do not edit comment generated here */
 }
 

@@ -9,6 +9,8 @@
     <Files>
       <Path>r_option_cc.txt</Path>
       <Category Name="dev">
+        <Path>dev\i2c.c</Path>
+        <Path>dev\i2c.h</Path>
         <Path>dev\timer.c</Path>
         <Path>dev\timer.h</Path>
       </Category>
@@ -54,7 +56,7 @@
         <CompileOptions>
           <Option>-cpu=S2</Option>
           <Option>-c</Option>
-          <Option>-dev="E:/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-dev="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-I "${ProjDirPath}\generate"</Option>
           <Option>-I "${ProjDirPath}\src"</Option>
           <Option>-I "${ProjDirPath}\source"</Option>
@@ -67,13 +69,13 @@
         <AssembleOptions>
           <Option>-cpu=S2</Option>
           <Option>-c</Option>
-          <Option>-dev="E:/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-dev="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-character_set=utf8</Option>
           <Option>-g</Option>
           <Option>-o "${ProjDirPath}\${ConfigName}"</Option>
         </AssembleOptions>
         <LinkOptions>
-          <Option>-device="E:/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-device="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-list</Option>
           <Option>-show=symbol</Option>
           <Option>-nooptimize</Option>
@@ -108,6 +110,7 @@
         <LinkOrder>
           <Path>HardwareDebug\cstart.obj</Path>
           <Path>HardwareDebug\stkinit.obj</Path>
+          <Path>HardwareDebug\i2c.obj</Path>
           <Path>HardwareDebug\timer.obj</Path>
           <Path>HardwareDebug\eeprom_backup.obj</Path>
           <Path>HardwareDebug\system.obj</Path>
@@ -137,7 +140,7 @@
         <CompileOptions>
           <Option>-cpu=S2</Option>
           <Option>-c</Option>
-          <Option>-dev="E:/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-dev="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-I "${ProjDirPath}\generate"</Option>
           <Option>-I "${ProjDirPath}\src"</Option>
           <Option>-character_set=utf8</Option>
@@ -148,13 +151,13 @@
         <AssembleOptions>
           <Option>-cpu=S2</Option>
           <Option>-c</Option>
-          <Option>-dev="E:/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-dev="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-character_set=utf8</Option>
           <Option>-g</Option>
           <Option>-o "${ProjDirPath}\${ConfigName}"</Option>
         </AssembleOptions>
         <LinkOptions>
-          <Option>-device="E:/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-device="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-list</Option>
           <Option>-show=symbol</Option>
           <Option>-nooptimize</Option>
@@ -199,6 +202,7 @@
           <Path>Debug\r_systeminit.obj</Path>
           <Path>Debug\E2_EEPROM_IC_Write_Read_cycle.lib</Path>
         </LinkOrder>
+        <NoTargetFile Target="dev\i2c.c"/>
         <NoTargetFile Target="dev\timer.c"/>
         <NoTargetFile Target="source\EEPROM\eeprom_backup.c"/>
         <NoTargetFile Target="source\system.c"/>
@@ -212,7 +216,7 @@
         <CompileOptions>
           <Option>-cpu=S2</Option>
           <Option>-c</Option>
-          <Option>-dev="E:/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-dev="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-I "${ProjDirPath}\generate"</Option>
           <Option>-I "${ProjDirPath}\src"</Option>
           <Option>-character_set=utf8</Option>
@@ -222,12 +226,12 @@
         <AssembleOptions>
           <Option>-cpu=S2</Option>
           <Option>-c</Option>
-          <Option>-dev="E:/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-dev="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-character_set=utf8</Option>
           <Option>-o "${ProjDirPath}\${ConfigName}"</Option>
         </AssembleOptions>
         <LinkOptions>
-          <Option>-device="E:/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-device="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-list</Option>
           <Option>-show=symbol</Option>
           <Option>-nooptimize</Option>
@@ -271,6 +275,7 @@
           <Path>Release\r_systeminit.obj</Path>
           <Path>Release\E2_EEPROM_IC_Write_Read_cycle.lib</Path>
         </LinkOrder>
+        <NoTargetFile Target="dev\i2c.c"/>
         <NoTargetFile Target="dev\timer.c"/>
         <NoTargetFile Target="source\EEPROM\eeprom_backup.c"/>
         <NoTargetFile Target="source\system.c"/>

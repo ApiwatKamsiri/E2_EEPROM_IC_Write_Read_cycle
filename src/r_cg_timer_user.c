@@ -32,6 +32,7 @@ Includes
 #include "r_cg_macrodriver.h"
 #include "r_cg_timer.h"
 /* Start user code for include. Do not edit comment generated here */
+#include "..\\dev\timer.h"
 /* End user code. Do not edit comment generated here */
 #include "r_cg_userdefine.h"
 

@@ -18,7 +18,13 @@ Include
 Define function
 ***********************************************************************************************************************/
 SysTimer_type TimerProcSys;
-
+#define Value_1MS 1
+#define Value_10MS 10
+#define Value_20MS 20
+#define Value_100MS 100
+#define Value_1S 1000
+#define Value_1Min 60UL* 1000UL
+#define Value_1Hr 60UL * 60UL * 1000UL
 
 /***********************************************************************************************************************
 Pragma function
@@ -31,7 +37,7 @@ System timer initial function
 ***********************************************************************************************************************/
 void SysTimer_Init(void)
 {
-		//Global variable
+		//Global variable (Start hartware)
 		R_TAU0_Channel4_Start();
 
 		TimerProcSys.periodic1Ms.counter   = 0;
@@ -55,19 +61,19 @@ void SysTimer_Init(void)
 	    TimerProcSys.periodic1Hour.counter = 0;
 	    TimerProcSys.periodic1Hour.isTimeout = 0;
 
-	    SysTimer_Set(SYS_TIMER_1MS, 1);
-	    SysTimer_Set(SYS_TIMER_10MS, 10);
-	    SysTimer_Set(SYS_TIMER_20MS, 20);
-	    SysTimer_Set(SYS_TIMER_100MS, 20);
-	    SysTimer_Set(SYS_TIMER_1SEC, 1000);
-	    SysTimer_Set(SYS_TIMER_1MIN, 60 * 1000);
-	    SysTimer_Set(SYS_TIMER_1HOUR, 60 * 60 * 1000);
+	    SysTimer_Set(SYS_TIMER_1MS, Value_1MS);
+	    SysTimer_Set(SYS_TIMER_10MS, Value_10MS);
+	    SysTimer_Set(SYS_TIMER_20MS, Value_20MS);
+	    SysTimer_Set(SYS_TIMER_100MS, Value_100MS);
+	    SysTimer_Set(SYS_TIMER_1SEC, Value_1S);
+	    SysTimer_Set(SYS_TIMER_1MIN, Value_1Min);
+	    SysTimer_Set(SYS_TIMER_1HOUR, Value_1Hr);
 }
 
 /***********************************************************************************************************************
-System timer initial function
+System timer function
 ***********************************************************************************************************************/
-void SysTimer_Set(SysTimer_Channel_1ms channel, uint16_t durationMs)
+void SysTimer_Set(SysTimer_Channel_1ms channel, uint32_t durationMs)
 {
 	SysTimer_1ms *pTimer = NULL;
 
@@ -108,6 +114,7 @@ void SysTimer_Set(SysTimer_Channel_1ms channel, uint16_t durationMs)
     else
     {
     	DI();	//Protect ticker during the loop
+    	pTimer->reload = durationMs;
     	pTimer->counter = durationMs;
     	pTimer->isTimeout = 0;
         EI();	//Start
@@ -121,31 +128,60 @@ void Timer_Hardware_ISR(void)
 {
     if (TimerProcSys.periodic1Ms.counter > 0) {
         TimerProcSys.periodic1Ms.counter--;
-        if (TimerProcSys.periodic1Ms.counter == 0) TimerProcSys.periodic1Ms.isTimeout = 1;
+        if (TimerProcSys.periodic1Ms.counter == 0)
+        {
+        	TimerProcSys.periodic1Ms.isTimeout = 1;
+        	TimerProcSys.periodic1Ms.counter = TimerProcSys.periodic1Ms.reload;
+        }
     }
     if (TimerProcSys.periodic10Ms.counter > 0) {
         TimerProcSys.periodic10Ms.counter--;
-        if (TimerProcSys.periodic10Ms.counter == 0) TimerProcSys.periodic10Ms.isTimeout = 1;
+        if (TimerProcSys.periodic10Ms.counter == 0)
+        {
+        	TimerProcSys.periodic10Ms.isTimeout = 1;
+        	TimerProcSys.periodic10Ms.counter = TimerProcSys.periodic10Ms.reload;
+        }
     }
     if (TimerProcSys.periodic20Ms.counter > 0) {
         TimerProcSys.periodic20Ms.counter--;
-        if (TimerProcSys.periodic20Ms.counter == 0) TimerProcSys.periodic20Ms.isTimeout = 1;
+        if (TimerProcSys.periodic20Ms.counter == 0)
+        {
+        	TimerProcSys.periodic20Ms.isTimeout = 1;
+        	TimerProcSys.periodic20Ms.counter = TimerProcSys.periodic20Ms.reload;
+        }
     }
     if (TimerProcSys.periodic100Ms.counter > 0) {
         TimerProcSys.periodic100Ms.counter--;
-        if (TimerProcSys.periodic100Ms.counter == 0) TimerProcSys.periodic100Ms.isTimeout = 1;
+        if (TimerProcSys.periodic100Ms.counter == 0)
+        {
+        	TimerProcSys.periodic100Ms.isTimeout = 1;
+        	TimerProcSys.periodic100Ms.counter = TimerProcSys.periodic100Ms.reload;
+        }
+
     }
     if (TimerProcSys.periodic1Sec.counter > 0) {
         TimerProcSys.periodic1Sec.counter--;
-        if (TimerProcSys.periodic1Sec.counter == 0) TimerProcSys.periodic1Sec.isTimeout = 1;
+        if (TimerProcSys.periodic1Sec.counter == 0)
+        {
+        	TimerProcSys.periodic1Sec.isTimeout = 1;
+        	TimerProcSys.periodic1Sec.counter = TimerProcSys.periodic1Sec.reload;
+        }
     }
     if (TimerProcSys.periodic1Min.counter > 0) {
         TimerProcSys.periodic1Min.counter--;
-        if (TimerProcSys.periodic1Min.counter == 0) TimerProcSys.periodic1Min.isTimeout = 1;
+        if (TimerProcSys.periodic1Min.counter == 0)
+        {
+        	TimerProcSys.periodic1Min.isTimeout = 1;
+        	TimerProcSys.periodic1Min.counter = TimerProcSys.periodic1Min.reload;
+        }
     }
     if (TimerProcSys.periodic1Hour.counter > 0) {
         TimerProcSys.periodic1Hour.counter--;
-        if (TimerProcSys.periodic1Hour.counter == 0) TimerProcSys.periodic1Hour.isTimeout = 1;
+        if (TimerProcSys.periodic1Hour.counter == 0)
+        {
+        	TimerProcSys.periodic1Hour.isTimeout = 1;
+        	TimerProcSys.periodic1Hour.counter = TimerProcSys.periodic1Hour.reload;
+        }
     }
 }
 

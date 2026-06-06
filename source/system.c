@@ -23,10 +23,17 @@ Initial state
 void SystemInitState(void)
 {
 	SysProc->SysDev.pTimer = &TimerProcSys;
+	SysProc->SysDev.pI2C = &I2CProcSys;
+
 	SysProc->SysProcess.pEep = &processCurrent;
 
+	//Hardware
 	SysTimer_Init();		//Initial hardware timer
-	EepromBackup_Init();	//Initial eeprom backuo
+	SysI2C_Init();			//Initial hardware i2c
+
+	//Functiuon
+	EepromBackup_Init();	//Initial eeprom backup
+
 }
 
 /***********************************************************************************************************************
@@ -36,30 +43,24 @@ void SystemRunTimerState(void)
 {
 	SysTimer_Channel_1ms activeTimer = SysTimer_GetActiveTimer();
 
-	switch (activeTimer)
-	    {
-	        case SYS_TIMER_10MS:
-					MainState();
-					SysTimer_Set(SYS_TIMER_10MS, 10);
-	            break;
-	        default:
-	        		SystemRunTimerStateDefault(activeTimer);
-	            break;
-	    }
-}
+	//Global loop
+	MainState();
 
-/***********************************************************************************************************************
-System loop state default
-***********************************************************************************************************************/
-void SystemRunTimerStateDefault(SysTimer_Channel_1ms activeTimer)
-{
+	//Timer loop
 	switch (activeTimer)
 	    {
-	        case SYS_TIMER_10MS:
-	        		MainState();
-	            	SysTimer_Set(SYS_TIMER_10MS, 10);
-	            break;
+			case SYS_TIMER_1HOUR:
+			case SYS_TIMER_1MIN:
+			case SYS_TIMER_1SEC:
+			case SYS_TIMER_100MS:
+			case SYS_TIMER_20MS:
+			case SYS_TIMER_10MS:
+			case SYS_TIMER_1MS:
+					;
+				break;
+
 	        default:
+	        		;
 	            break;
 	    }
 }
@@ -70,5 +71,6 @@ Main loop state
 ***********************************************************************************************************************/
 void MainState(void)
 {
+	//Global loop
 	EEPROMBackupStateHandler();
 }

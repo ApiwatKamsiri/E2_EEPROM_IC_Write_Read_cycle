@@ -12,6 +12,7 @@
 Include function
 ***********************************************************************************************************************/
 #include "..\\dev\timer.h"
+#include "..\\dev\i2c.h"
 #include "EEPROM\eeprom_backup.h"
 //Global variable
 #include "r_cg_macrodriver.h"
@@ -21,6 +22,7 @@ Typedef struc function
 ***********************************************************************************************************************/
 typedef struct {
 	SysTimer_type *pTimer;
+	SysI2C_type *pI2C;
 } SysDev_type;
 
 typedef struct {
@@ -39,7 +41,6 @@ Define function
 #define CoreSoftwareVersion 00
 #define ParameterSoftwareVersion 00
 
-extern void SystemRunTimerStateDefault(SysTimer_Channel_1ms activeTimer);
 extern void SystemInitState(void);
 extern void SystemRunTimerState(void);
 extern void MainState(void);
