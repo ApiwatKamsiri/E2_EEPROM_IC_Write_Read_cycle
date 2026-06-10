@@ -54,6 +54,12 @@ extern void SysTimer_Init(void);
 extern void SysTimer_Set(SysTimer_Channel_1ms channel, uint32_t durationMs);
 extern void Timer_Hardware_ISR(void);
 extern SysTimer_Channel_1ms SysTimer_GetActiveTimer(void);
-
+extern void SysTimer_1Ms(void);
+extern void SysTimer_10Ms(void);
+extern void SysTimer_20Ms(void);
+extern void SysTimer_100Ms(void);
+extern void SysTimer_1SEC(void);
+extern void SysTimer_1MIN(void);
+extern void SysTimer_1HOUR(void);
 
 #endif

@@ -23,7 +23,7 @@
 * Device(s)    : R5F101PH
 * Tool-Chain   : CCRL
 * Description  : This file implements device driver for Serial module.
-* Creation Date: 5/30/2026
+* Creation Date: 09/06/2026
 ***********************************************************************************************************************/
 
 #ifndef SERIAL_H

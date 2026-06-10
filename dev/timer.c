@@ -61,6 +61,7 @@ void SysTimer_Init(void)
 	    TimerProcSys.periodic1Hour.counter = 0;
 	    TimerProcSys.periodic1Hour.isTimeout = 0;
 
+
 	    SysTimer_Set(SYS_TIMER_1MS, Value_1MS);
 	    SysTimer_Set(SYS_TIMER_10MS, Value_10MS);
 	    SysTimer_Set(SYS_TIMER_20MS, Value_20MS);
@@ -102,7 +103,8 @@ void SysTimer_Set(SysTimer_Channel_1ms channel, uint32_t durationMs)
 	        		pTimer = &TimerProcSys.periodic1Hour;
 	        	break;
 	        default:
-	        	return;
+	        	pTimer = NULL;
+	        	break;
 	    }
 
 	//Load time value in the channel
@@ -194,40 +196,45 @@ SysTimer_Channel_1ms SysTimer_GetActiveTimer(void)
 		if (TimerProcSys.periodic1Ms.isTimeout == 1)
 	    {
 	        TimerProcSys.periodic1Ms.isTimeout = 0;
+	        SysTimer_1Ms();
 	        return SYS_TIMER_1MS;
 	    }
-	    else if (TimerProcSys.periodic10Ms.isTimeout == 1)
+	    if (TimerProcSys.periodic10Ms.isTimeout == 1)
 	    {
 	        TimerProcSys.periodic10Ms.isTimeout = 0;
+	        SysTimer_10Ms();
 	        return SYS_TIMER_10MS;
 	    }
-	    else if (TimerProcSys.periodic20Ms.isTimeout == 1)
+	    if (TimerProcSys.periodic20Ms.isTimeout == 1)
 	    {
 	        TimerProcSys.periodic20Ms.isTimeout = 0;
+	        SysTimer_20Ms();
 	        return SYS_TIMER_20MS;
 	    }
-	    else if (TimerProcSys.periodic100Ms.isTimeout == 1)
+	    if (TimerProcSys.periodic100Ms.isTimeout == 1)
 	    {
 	        TimerProcSys.periodic100Ms.isTimeout = 0;
+	        SysTimer_100Ms();
 	        return SYS_TIMER_100MS;
 	    }
-	    else if (TimerProcSys.periodic1Sec.isTimeout == 1)
+	    if (TimerProcSys.periodic1Sec.isTimeout == 1)
 	    {
 	        TimerProcSys.periodic1Sec.isTimeout = 0;
+	        SysTimer_1SEC();
 	        return SYS_TIMER_1SEC;
 	    }
-	    else if (TimerProcSys.periodic1Min.isTimeout == 1)
+	    if (TimerProcSys.periodic1Min.isTimeout == 1)
 	    {
 	        TimerProcSys.periodic1Min.isTimeout = 0;
+	        SysTimer_1MIN();
 	        return SYS_TIMER_1MIN;
 	    }
-	    else if (TimerProcSys.periodic1Hour.isTimeout == 1)
+	    if (TimerProcSys.periodic1Hour.isTimeout == 1)
 	    {
 	        TimerProcSys.periodic1Hour.isTimeout = 0;
+	        SysTimer_1HOUR();
 	        return SYS_TIMER_1HOUR;
 	    }
 
 return (SysTimer_Channel_1ms)-1;
 }
-
-

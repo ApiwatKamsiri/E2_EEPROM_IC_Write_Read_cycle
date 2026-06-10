@@ -27,9 +27,14 @@ void SystemInitState(void)
 
 	SysProc->SysProcess.pEep = &processCurrent;
 
+	//Hardware global
+	R_WDT_Create();			//Initial hardware global watchdog
+
 	//Hardware
 	SysTimer_Init();		//Initial hardware timer
 	SysI2C_Init();			//Initial hardware i2c
+
+	R_PORT_Create();		//ไปเพิ่ม port หำะะรืเ ด้วย
 
 	//Functiuon
 	EepromBackup_Init();	//Initial eeprom backup
@@ -39,38 +44,54 @@ void SystemInitState(void)
 /***********************************************************************************************************************
 System loop state
 ***********************************************************************************************************************/
-void SystemRunTimerState(void)
+void SystemRunState(void)
 {
-	SysTimer_Channel_1ms activeTimer = SysTimer_GetActiveTimer();
+	//Global hardware reset watchdog
+	R_WDT_Restart();
 
-	//Global loop
-	MainState();
+	//Global define Timer
+	SysTimer_GetActiveTimer();
 
-	//Timer loop
-	switch (activeTimer)
-	    {
-			case SYS_TIMER_1HOUR:
-			case SYS_TIMER_1MIN:
-			case SYS_TIMER_1SEC:
-			case SYS_TIMER_100MS:
-			case SYS_TIMER_20MS:
-			case SYS_TIMER_10MS:
-			case SYS_TIMER_1MS:
-					;
-				break;
-
-	        default:
-	        		;
-	            break;
-	    }
-}
-
-
-/***********************************************************************************************************************
-Main loop state
-***********************************************************************************************************************/
-void MainState(void)
-{
 	//Global loop
 	EEPROMBackupStateHandler();
 }
+
+/***********************************************************************************************************************
+System timer loop state
+***********************************************************************************************************************/
+void SysTimer_1Ms(void)
+{
+	EEPROM1MsTask();
+}
+
+void SysTimer_10Ms(void)
+{
+
+	EEPROM10MsTask();
+}
+
+void SysTimer_20Ms(void)
+{
+	EEPROM20MsTask();
+}
+
+void SysTimer_100Ms(void)
+{
+	;
+}
+
+void SysTimer_1SEC(void)
+{
+	EEPROM1sTask();
+}
+
+void SysTimer_1MIN(void)
+{
+	EEPROM1MINTask();
+}
+
+void SysTimer_1HOUR(void)
+{
+	;
+}
+

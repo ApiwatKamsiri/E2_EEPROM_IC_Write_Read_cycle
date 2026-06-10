@@ -23,7 +23,7 @@
 * Device(s)    : R5F101PH
 * Tool-Chain   : CCRL
 * Description  : This file implements device driver for Serial module.
-* Creation Date: 5/30/2026
+* Creation Date: 09/06/2026
 ***********************************************************************************************************************/
 
 /***********************************************************************************************************************
@@ -181,7 +181,7 @@ static void r_iica0_callback_master_error(MD_STATUS flag)
 {
     /* Start user code. Do not edit comment generated here */
     //Should be add when created new system
-    I2C_Hardware_Error_ISR();
+    I2C_Hardware_Error_ISR(flag);
     /* End user code. Do not edit comment generated here */
 }
 
@@ -193,10 +193,9 @@ static void r_iica0_callback_master_error(MD_STATUS flag)
 ***********************************************************************************************************************/
 static void r_iica0_callback_master_receiveend(void)
 {
-    SPT0 = 1U;
     /* Start user code. Do not edit comment generated here */
     //Should be add when created new system
-    I2C_Hardware_ISR();
+	I2C_Read_Hardware_ISR();
     /* End user code. Do not edit comment generated here */
 }
 
@@ -208,10 +207,9 @@ static void r_iica0_callback_master_receiveend(void)
 ***********************************************************************************************************************/
 static void r_iica0_callback_master_sendend(void)
 {
-    SPT0 = 1U;
     /* Start user code. Do not edit comment generated here */
     //Should be add when created new system
-    I2C_Hardware_ISR();
+	I2C_Write_Hardware_ISR();
     /* End user code. Do not edit comment generated here */
 }
 

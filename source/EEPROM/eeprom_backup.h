@@ -13,8 +13,18 @@ Include function
 ***********************************************************************************************************************/
 #include "..\\dev\timer.h"
 
-#define EEPROM_SIZE_BYTES_64KB 8192
-#define EEPROM_SIZE_BYTES_32KB 4096
+#define SLAVE_ADDRESS 160							//160dec -> 0xA0
+#define EEPROM_PAGE_SIZE 32							//Write cycle
+#define START_READ_ADDRESS 0						//Start address for read
+#define EEPROM_SIZE_BYTES_64KB 8192					//EEPROM size 64KB
+#define EEPROM_SIZE_BYTES_32KB 4096					//EEPROM size 32KB
+//#define SELECT64KB									//Define when use 64KBIT
+
+#ifdef SELECT64KB
+#define EEPROM_MAX_ADDR EEPROM_SIZE_BYTES_64KB
+#else
+#define EEPROM_MAX_ADDR EEPROM_SIZE_BYTES_32KB
+#endif
 
 /***********************************************************************************************************************
 typedef counting function
@@ -37,13 +47,17 @@ typedef enum {
 } workstate_em;
 
 typedef struct {
-	workstate_em workstate;
-	uint8_t backup_buffer[EEPROM_SIZE_BYTES_64KB];
-	uint8_t forceWrite;
+	uint8_t FirstPlug :1;
+	uint8_t CommandWrite :1;
+	uint8_t CommandRead :1;
+	uint8_t GetStatusComplete :1;
+	uint8_t Current_buffer[EEPROM_PAGE_SIZE];
+	uint8_t Backup_buffer[EEPROM_MAX_ADDR];
 } EepromProcess_st;
 
 typedef struct {
 	EepromProcessProc_em process;
+	workstate_em workstate;
 	EepromProcess_st status;
 } EepromProcessStruct_t;
 
@@ -59,10 +73,10 @@ void UpdateEEPROMTask(void);
 void EEPROM_ReadAll_Task(void);
 void EEPROM_Write_Task(void);
 
-
-static void EEPROM10MsTask(void);
-static void EEPROM20MsTask(void);
-static void EEPROM1sTask(void);
-static void EEPROM1MINTask(void);
+extern void EEPROM1MsTask(void);
+extern void EEPROM10MsTask(void);
+extern void EEPROM20MsTask(void);
+extern void EEPROM1sTask(void);
+extern void EEPROM1MINTask(void);
 
 #endif

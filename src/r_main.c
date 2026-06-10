@@ -23,7 +23,7 @@
 * Device(s)    : R5F101PH
 * Tool-Chain   : CCRL
 * Description  : This file implements main function.
-* Creation Date: 5/30/2026
+* Creation Date: 09/06/2026
 ***********************************************************************************************************************/
 
 /***********************************************************************************************************************
@@ -66,7 +66,7 @@ void main(void)
     while (1U)
     {
     	//Should be add when created new system
-    	SystemRunTimerState();
+    	SystemRunState();
     }
     /* End user code. Do not edit comment generated here */
 }

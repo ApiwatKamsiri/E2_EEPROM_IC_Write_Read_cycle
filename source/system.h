@@ -42,8 +42,7 @@ Define function
 #define ParameterSoftwareVersion 00
 
 extern void SystemInitState(void);
-extern void SystemRunTimerState(void);
-extern void MainState(void);
+extern void SystemRunState(void);
 
 extern System_Registry_t *SysProc;
 
