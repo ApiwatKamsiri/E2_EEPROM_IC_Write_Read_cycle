@@ -46,11 +46,27 @@ typedef enum {
 	EEPROM_STATE_Completed,
 } workstate_em;
 
+typedef enum {
+	EEPROM_PREPARE_NONE = 0,
+	EEPROM_PREPARE_DataCaseCompleted,
+	EEPROM_PREPARE_Completed,
+	EEPROM_PREPARE_Stop,
+} resultPrepareData_em;
+
+typedef enum {
+	EEPROM_CheckData_NONE = 0,
+	EEPROM_CheckData_CaseBank,
+} resultCheckData_em;
+
 typedef struct {
 	uint8_t FirstPlug :1;
 	uint8_t CommandWrite :1;
 	uint8_t CommandRead :1;
 	uint8_t GetStatusComplete :1;
+	resultCheckData_em Get_ResultCheckData;
+	resultPrepareData_em Get_ResultPrepareData;
+	uint8_t WriteCycleTime_1s;
+	uint16_t Current_Location;
 	uint8_t Current_buffer[EEPROM_PAGE_SIZE];
 	uint8_t Backup_buffer[EEPROM_MAX_ADDR];
 } EepromProcess_st;
@@ -72,6 +88,8 @@ void EEPROMBackupStateHandler(void);
 void UpdateEEPROMTask(void);
 void EEPROM_ReadAll_Task(void);
 void EEPROM_Write_Task(void);
+uint8_t EEPROM_CheckData_Task(void);
+uint8_t EEPROM_Prepare_Task(void);
 
 extern void EEPROM1MsTask(void);
 extern void EEPROM10MsTask(void);

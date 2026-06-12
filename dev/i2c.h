@@ -42,7 +42,6 @@ typedef struct
 	I2C_Error_t  Error_flag;
 	uint8_t      slave_addr;
 	uint16_t     length;
-	uint16_t     current_offset;
 	uint8_t      *buffer;
 } SysI2C_type;
 
@@ -59,7 +58,7 @@ extern void I2C_Write_Hardware_ISR(void);
 extern void I2C_Read_Hardware_ISR(void);
 extern void I2C_Hardware_Error_ISR(uint8_t flag);
 extern void SysI2C_Reset_Status(void);
-extern void SysI2C_Dev_Write(uint8_t slave_addr, uint16_t mem_addr, uint8_t *data, uint16_t len);
+extern uint8_t SysI2C_Dev_Write(uint8_t slave_addr, uint16_t mem_addr, uint8_t *data, uint16_t len);
 extern uint8_t SysI2C_Dev_Read(uint8_t slave_addr, uint16_t mem_addr, uint8_t *data, uint16_t len);
 extern I2C_Status_t SysI2C_Dev_GetStatus(void);
 
