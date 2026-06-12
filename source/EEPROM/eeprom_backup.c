@@ -21,7 +21,7 @@ Define function
 EepromProcessStruct_t processCurrent;
 
 /* Normal variable */
-#define StartWriteTime_set 2
+#define StartWriteTime_set 5
 #define StartDataWrite_location 0
 #define StartDataAddress_location 4079
 #define StartDataCountCycle_set 4095
@@ -40,6 +40,8 @@ void EepromBackup_Init(void)
 	processCurrent.status.FirstPlug = 1;//0;//
 	processCurrent.status.GetStatusComplete = 0;
 	processCurrent.status.WriteCycleTime_1s = 0;
+	processCurrent.status.AlreadyCommandWrted = 0;
+	processCurrent.status.EEPROM_Cuurent_Address = START_READ_ADDRESS;
 
 	/* Reset buffer function */
 	memset(processCurrent.status.Current_buffer, 0, EEPROM_PAGE_SIZE);
@@ -67,24 +69,26 @@ void UpdateEEPROMTask(void)
 	}
 	else
 	{
+		/* Select process */
 		if(processCurrent.status.CommandWrite && !processCurrent.status.CommandRead)
 			processCurrent.process = EEPROM_PROCESS_UPDATE_Writing;
 		else if(processCurrent.status.CommandRead && !processCurrent.status.CommandWrite)
 			processCurrent.process = EEPROM_PROCESS_UPDATE_Reading;
 		else if(processCurrent.status.CommandWrite && processCurrent.status.CommandRead)
 			processCurrent.process = EEPROM_PROCESS_UPDATE_Reading;
-	}
 
-	/* Normal operation */
-	if(processCurrent.status.WriteCycleTime_1s >= StartWriteTime_set)
-	{
-		if(!processCurrent.status.CommandWrite && !processCurrent.status.CommandRead)
+		/* Write cycle process */
+		if(processCurrent.status.WriteCycleTime_1s >= StartWriteTime_set)
 		{
-			processCurrent.status.CommandWrite = 1;
-		}
+			if(!processCurrent.status.CommandWrite && !processCurrent.status.CommandRead)
+			{
+				processCurrent.status.CommandWrite = 1;
+			}
 
-		processCurrent.status.WriteCycleTime_1s = 0;
+			processCurrent.status.WriteCycleTime_1s = 0;
+		}
 	}
+
 
 	/* I2C Get status function */
 	if (SysI2C_Dev_GetStatus() == I2C_STATUS_BUSY_COMPLETED)
@@ -119,22 +123,39 @@ void EEPROM10MsTask(void)
 
 					case EEPROM_STATE_Init:
 							/* Change state work operation */
-							processCurrent.workstate = EEPROM_STATE_PrepareData;
+							if(EEPROM_Prepare_Task() == EEPROM_PREPARE_DataCaseCompleted)
+								processCurrent.workstate = EEPROM_STATE_PrepareData;
 						break;
 
 					case EEPROM_STATE_PrepareData:
 							/* Prepare data state work operation */
-							//EEPROM_Prepare_Task();
-
-							if(EEPROM_Prepare_Task() == EEPROM_PREPARE_Completed)
+							if(processCurrent.status.AlreadyCommandWrted)
 							{
 								processCurrent.workstate = EEPROM_STATE_PrepareData;
 								I2CProcSys.status = I2C_STATUS_IDLE;
 							}
+							else
+							{
+								if(processCurrent.status.EEPROM_ALL_PAGE)
+								{
+									if(processCurrent.status.EEPROM_Cuurent_PAGE <= processCurrent.status.EEPROM_ALL_PAGE)
+									{
+										if(processCurrent.status.EEPROM_Cuurent_PAGE == 0)
+											processCurrent.status.EEPROM_Cuurent_Address = START_READ_ADDRESS;
+										else
+											processCurrent.status.EEPROM_Cuurent_Address += EEPROM_PAGE_SIZE;
+
+										processCurrent.status.EEPROM_Cuurent_PAGE++;
+										processCurrent.status.AlreadyCommandWrted = 1;
+									}
+								}
+								else
+									processCurrent.status.EEPROM_ALL_PAGE = EEPROM_MAX_ADDR/32;
+							}
 						break;
 
 					case EEPROM_STATE_Writing_Reading:
-							SysI2C_Dev_Write(SLAVE_ADDRESS, START_READ_ADDRESS, processCurrent.status.Current_buffer, EEPROM_PAGE_SIZE);
+							SysI2C_Dev_Write(SLAVE_ADDRESS, processCurrent.status.EEPROM_Cuurent_Address, processCurrent.status.Current_buffer, EEPROM_PAGE_SIZE);
 
 							if (processCurrent.status.GetStatusComplete)
 							{
@@ -145,7 +166,18 @@ void EEPROM10MsTask(void)
 						break;
 
 					case EEPROM_STATE_GetData:
-							processCurrent.workstate = EEPROM_STATE_Check;
+							if(processCurrent.status.EEPROM_Cuurent_PAGE != processCurrent.status.EEPROM_ALL_PAGE)
+							{
+								processCurrent.status.AlreadyCommandWrted = 0;
+								processCurrent.workstate = EEPROM_STATE_PrepareData;
+							}
+							else
+							{
+								processCurrent.status.AlreadyCommandWrted = 0;
+								processCurrent.status.EEPROM_ALL_PAGE = 0;
+								processCurrent.status.EEPROM_Cuurent_PAGE = 0;
+								processCurrent.workstate = EEPROM_STATE_Check;
+							}
 						break;
 
 					case EEPROM_STATE_Check:
@@ -227,8 +259,6 @@ void EEPROM1sTask(void)
 	if(processCurrent.status.WriteCycleTime_1s < 0xFF)
 		processCurrent.status.WriteCycleTime_1s++;
 
-	//For DEBUG
-	EEPROM_Prepare_Task();
 }
 void EEPROM1MINTask(void)
 {;}
@@ -250,8 +280,12 @@ uint8_t EEPROM_CheckData_Task(void)
 
 uint8_t EEPROM_Prepare_Task(void)
 {
-	EEPROM_CheckData_Task();
+	uint16_t loc;
+	uint16_t prev_sum;
+	uint16_t j;
+	uint16_t write_idx;
 
+	// Case 1 : Check the data is bank
 	if(EEPROM_CheckData_Task() == EEPROM_CheckData_CaseBank)
 	{
 		processCurrent.status.Backup_buffer[StartDataWrite_location] = 1;
@@ -261,276 +295,64 @@ uint8_t EEPROM_Prepare_Task(void)
 
 		return EEPROM_PREPARE_DataCaseCompleted;
 	}
-	else
-	{
-		if(processCurrent.status.Backup_buffer[4078] == 255)
-		{
-			memset(processCurrent.status.Backup_buffer, 0, EEPROM_MAX_ADDR - 1);
 
-			processCurrent.status.Backup_buffer[StartDataWrite_location] = 1;
+	loc = processCurrent.status.Current_Location;
+
+	// Case 2 : The data is full (Reset and set Backup buffer)
+	if (processCurrent.status.Backup_buffer[4078] == 255)
+	    {
+	        memset(processCurrent.status.Backup_buffer, 0, EEPROM_MAX_ADDR - 1);
+
+	        processCurrent.status.Backup_buffer[StartDataCountCycle_set]++;
+	        processCurrent.status.Current_Location = StartDataAddress_location;
 			processCurrent.status.Backup_buffer[StartDataAddress_location] = 1;
-			processCurrent.status.Backup_buffer[StartDataCountCycle_set] = processCurrent.status.Backup_buffer[StartDataCountCycle_set] + 1;
-			processCurrent.status.Current_Location = StartDataAddress_location;
+			processCurrent.status.Backup_buffer[StartDataWrite_location] = 1;
 
-			return EEPROM_PREPARE_DataCaseCompleted;
-		}
-		else if(processCurrent.status.Backup_buffer[4078] == 255 && processCurrent.status.Backup_buffer[4095] == 255)
-			return EEPROM_PREPARE_Stop;
-		else
-		{
-			if(processCurrent.status.Current_Location == 4079)	//1-255
+	        return EEPROM_PREPARE_DataCaseCompleted;
+	    }
+
+	// Case 3 : Normal operation
+	if (loc >= 4079 && loc <= 4094)
+	    {
+			if(processCurrent.status.Backup_buffer[4094] > 253)
 			{
-				if(processCurrent.status.Backup_buffer[4079] == 255)
+				for(j = 4079; j <= loc; j++)
 				{
-					processCurrent.status.Backup_buffer[4080] = 1;
-					processCurrent.status.Backup_buffer[255] = processCurrent.status.Backup_buffer[255] + 1;
-					processCurrent.status.Current_Location = 4080;
-
-					return EEPROM_PREPARE_DataCaseCompleted;
+					processCurrent.status.Backup_buffer[j] = 0;
 				}
-				else
-				{
-					processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4079]] = processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4079]] + 1;
-					processCurrent.status.Backup_buffer[4079] = processCurrent.status.Backup_buffer[4079] + 1;
-					processCurrent.status.Current_Location = 4079;
+				processCurrent.status.Current_Location = 4079;
+				write_idx = 0;
+				processCurrent.status.Backup_buffer[write_idx]++;
+				processCurrent.status.Backup_buffer[processCurrent.status.Current_Location] = 1;
 
-					return EEPROM_PREPARE_DataCaseCompleted;
-				}
 			}
-			else if(processCurrent.status.Current_Location == 4080)	//256-510
-			{
-				if(processCurrent.status.Backup_buffer[4080] == 255)
-				{
-					processCurrent.status.Backup_buffer[4081] = 1;
-					processCurrent.status.Backup_buffer[510] = processCurrent.status.Backup_buffer[510] + 1;
-					processCurrent.status.Current_Location = 4081;
+			else if (processCurrent.status.Backup_buffer[loc] >= 255)
+	        {
+	            prev_sum = 0;
 
-					return EEPROM_PREPARE_DataCaseCompleted;
-				}
-				else
-				{
-					processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4079] + processCurrent.status.Backup_buffer[4080]] = processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4080]] + 1;
-					processCurrent.status.Backup_buffer[4080] = processCurrent.status.Backup_buffer[4080] + 1;
-					processCurrent.status.Current_Location = 4080;
+	            for(j = 4079; j < loc; j++) {
+	                prev_sum += processCurrent.status.Backup_buffer[j];
+	            }
+	            write_idx = prev_sum + processCurrent.status.Backup_buffer[loc];
 
-					return EEPROM_PREPARE_DataCaseCompleted;
-				}
-			}
-			else if(processCurrent.status.Current_Location == 4081)	//511 - 765
-			{
-				if(processCurrent.status.Backup_buffer[4081] == 255)
-				{
-					processCurrent.status.Backup_buffer[4082] = 1;
-					processCurrent.status.Backup_buffer[765] = processCurrent.status.Backup_buffer[765] + 1;
-					processCurrent.status.Current_Location = 4082;
+	            processCurrent.status.Current_Location = loc + 1;
+	            processCurrent.status.Backup_buffer[write_idx]++;
+	            processCurrent.status.Backup_buffer[processCurrent.status.Current_Location]++;
+	        }
+	        else
+	        {
+	            prev_sum = 0;
 
-					return EEPROM_PREPARE_DataCaseCompleted;
-				}
-				else
-				{
-					processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4080] + processCurrent.status.Backup_buffer[4081]] = processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4081]] + 1;
-					processCurrent.status.Backup_buffer[4081] = processCurrent.status.Backup_buffer[4081] + 1;
-					processCurrent.status.Current_Location = 4081;
+	            for(j = 4079; j < loc; j++) {
+	                prev_sum += processCurrent.status.Backup_buffer[j];
+	            }
+	            write_idx = prev_sum + processCurrent.status.Backup_buffer[loc];
 
-					return EEPROM_PREPARE_DataCaseCompleted;
-				}
-			}
-			else if(processCurrent.status.Current_Location == 4082)	//766 - 1020
-			{
-				if(processCurrent.status.Backup_buffer[4082] == 255)
-				{
-					processCurrent.status.Backup_buffer[4083] = 1;
-					processCurrent.status.Backup_buffer[1020] = processCurrent.status.Backup_buffer[1020] + 1;
-					processCurrent.status.Current_Location = 4083;
+	            processCurrent.status.Backup_buffer[write_idx]++;
+	            processCurrent.status.Backup_buffer[loc]++;
+	        }
+	        return EEPROM_PREPARE_DataCaseCompleted;
+	    }
 
-					return EEPROM_PREPARE_DataCaseCompleted;
-				}
-				else
-				{
-					processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4081] + processCurrent.status.Backup_buffer[4082]] = processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4082]] + 1;
-					processCurrent.status.Backup_buffer[4082] = processCurrent.status.Backup_buffer[4082] + 1;
-					processCurrent.status.Current_Location = 4082;
-
-					return EEPROM_PREPARE_DataCaseCompleted;
-				}
-			}
-			else if(processCurrent.status.Current_Location == 4083)	//1021 - 1275
-			{
-				if(processCurrent.status.Backup_buffer[4083] == 255)
-				{
-					processCurrent.status.Backup_buffer[4084] = 1;
-					processCurrent.status.Backup_buffer[1275] = processCurrent.status.Backup_buffer[1275] + 1;
-					processCurrent.status.Current_Location = 4084;
-
-					return EEPROM_PREPARE_DataCaseCompleted;
-				}
-				else
-				{
-					processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4082] + processCurrent.status.Backup_buffer[4083]] = processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4083]] + 1;
-					processCurrent.status.Backup_buffer[4083] = processCurrent.status.Backup_buffer[4083] + 1;
-					processCurrent.status.Current_Location = 4083;
-
-					return EEPROM_PREPARE_DataCaseCompleted;
-				}
-			}
-			else if(processCurrent.status.Current_Location == 4084)	//1276 - 1530
-			{
-				if(processCurrent.status.Backup_buffer[4084] == 255)
-				{
-					processCurrent.status.Backup_buffer[4085] = 1;
-					processCurrent.status.Backup_buffer[1530] = processCurrent.status.Backup_buffer[1530] + 1;
-					processCurrent.status.Current_Location = 4085;
-
-					return EEPROM_PREPARE_DataCaseCompleted;
-				}
-				else
-				{
-					processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4083] + processCurrent.status.Backup_buffer[4084]] = processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4084]] + 1;
-					processCurrent.status.Backup_buffer[4084] = processCurrent.status.Backup_buffer[4084] + 1;
-					processCurrent.status.Current_Location = 4084;
-
-					return EEPROM_PREPARE_DataCaseCompleted;
-				}
-			}
-			else if(processCurrent.status.Current_Location == 4085) // 1531 - 1785
-			{
-					if(processCurrent.status.Backup_buffer[4085] == 255) {
-						processCurrent.status.Backup_buffer[4086] = 1;
-						processCurrent.status.Backup_buffer[1785] = processCurrent.status.Backup_buffer[1785] + 1;
-						processCurrent.status.Current_Location = 4086;
-					} else {
-						processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4084] + processCurrent.status.Backup_buffer[4085]] = processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4085]] + 1;
-						processCurrent.status.Backup_buffer[4085] = processCurrent.status.Backup_buffer[4085] + 1;
-						processCurrent.status.Current_Location = 4085;
-					}
-					return EEPROM_PREPARE_DataCaseCompleted;
-			}
-			else if(processCurrent.status.Current_Location == 4086) // 1786 - 2040
-			{
-					if(processCurrent.status.Backup_buffer[4086] == 255) {
-						processCurrent.status.Backup_buffer[4087] = 1;
-						processCurrent.status.Backup_buffer[2040] = processCurrent.status.Backup_buffer[2040] + 1;
-						processCurrent.status.Current_Location = 4087;
-					} else {
-						processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4085] + processCurrent.status.Backup_buffer[4086]] = processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4086]] + 1;
-						processCurrent.status.Backup_buffer[4086] = processCurrent.status.Backup_buffer[4086] + 1;
-						processCurrent.status.Current_Location = 4086;
-					}
-					return EEPROM_PREPARE_DataCaseCompleted;
-			}
-			else if(processCurrent.status.Current_Location == 4087) // 2041 - 2295
-			{
-					if(processCurrent.status.Backup_buffer[4087] == 255) {
-						processCurrent.status.Backup_buffer[4088] = 1;
-						processCurrent.status.Backup_buffer[2295] = processCurrent.status.Backup_buffer[2295] + 1;
-						processCurrent.status.Current_Location = 4088;
-					} else {
-						processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4086] + processCurrent.status.Backup_buffer[4087]] = processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4087]] + 1;
-						processCurrent.status.Backup_buffer[4087] = processCurrent.status.Backup_buffer[4087] + 1;
-						processCurrent.status.Current_Location = 4087;
-					}
-					return EEPROM_PREPARE_DataCaseCompleted;
-			}
-			else if(processCurrent.status.Current_Location == 4088) // 2296 - 2550
-			{
-					if(processCurrent.status.Backup_buffer[4088] == 255) {
-						processCurrent.status.Backup_buffer[4089] = 1;
-						processCurrent.status.Backup_buffer[2550] = processCurrent.status.Backup_buffer[2550] + 1;
-						processCurrent.status.Current_Location = 4089;
-					} else {
-						processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4087] + processCurrent.status.Backup_buffer[4088]] = processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4088]] + 1;
-						processCurrent.status.Backup_buffer[4088] = processCurrent.status.Backup_buffer[4088] + 1;
-						processCurrent.status.Current_Location = 4088;
-					}
-					return EEPROM_PREPARE_DataCaseCompleted;
-			}
-			else if(processCurrent.status.Current_Location == 4089) // 2551 - 2805
-			{
-					if(processCurrent.status.Backup_buffer[4089] == 255) {
-						processCurrent.status.Backup_buffer[4090] = 1;
-						processCurrent.status.Backup_buffer[2805] = processCurrent.status.Backup_buffer[2805] + 1;
-						processCurrent.status.Current_Location = 4090;
-					} else {
-						processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4088] + processCurrent.status.Backup_buffer[4089]] = processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4089]] + 1;
-						processCurrent.status.Backup_buffer[4089] = processCurrent.status.Backup_buffer[4089] + 1;
-						processCurrent.status.Current_Location = 4089;
-					}
-					return EEPROM_PREPARE_DataCaseCompleted;
-			}
-			else if(processCurrent.status.Current_Location == 4090) // 2806 - 3060
-			{
-					if(processCurrent.status.Backup_buffer[4090] == 255) {
-						processCurrent.status.Backup_buffer[4091] = 1;
-						processCurrent.status.Backup_buffer[3060] = processCurrent.status.Backup_buffer[3060] + 1;
-						processCurrent.status.Current_Location = 4091;
-					} else {
-						processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4089] + processCurrent.status.Backup_buffer[4090]] = processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4090]] + 1;
-						processCurrent.status.Backup_buffer[4090] = processCurrent.status.Backup_buffer[4090] + 1;
-						processCurrent.status.Current_Location = 4090;
-					}
-					return EEPROM_PREPARE_DataCaseCompleted;
-			}
-			else if(processCurrent.status.Current_Location == 4091) // 3061 - 3315
-			{
-					if(processCurrent.status.Backup_buffer[4091] == 255) {
-						processCurrent.status.Backup_buffer[4092] = 1;
-						processCurrent.status.Backup_buffer[3315] = processCurrent.status.Backup_buffer[3315] + 1;
-						processCurrent.status.Current_Location = 4092;
-					} else {
-						processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4090] + processCurrent.status.Backup_buffer[4091]] = processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4091]] + 1;
-						processCurrent.status.Backup_buffer[4091] = processCurrent.status.Backup_buffer[4091] + 1;
-						processCurrent.status.Current_Location = 4091;
-					}
-					return EEPROM_PREPARE_DataCaseCompleted;
-			}
-			else if(processCurrent.status.Current_Location == 4092) // 3316 - 3570
-			{
-					if(processCurrent.status.Backup_buffer[4092] == 255) {
-						processCurrent.status.Backup_buffer[4093] = 1;
-						processCurrent.status.Backup_buffer[3570] = processCurrent.status.Backup_buffer[3570] + 1;
-						processCurrent.status.Current_Location = 4093;
-					} else {
-						processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4091] + processCurrent.status.Backup_buffer[4092]] = processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4092]] + 1;
-						processCurrent.status.Backup_buffer[4092] = processCurrent.status.Backup_buffer[4092] + 1;
-						processCurrent.status.Current_Location = 4092;
-					}
-					return EEPROM_PREPARE_DataCaseCompleted;
-			}
-			else if(processCurrent.status.Current_Location == 4093) // 3571 - 3825
-			{
-					if(processCurrent.status.Backup_buffer[4093] == 255) {
-						processCurrent.status.Backup_buffer[4094] = 1;
-						processCurrent.status.Backup_buffer[3825] = processCurrent.status.Backup_buffer[3825] + 1;
-						processCurrent.status.Current_Location = 4094;
-					} else {
-						processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4092] + processCurrent.status.Backup_buffer[4093]] = processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4093]] + 1;
-						processCurrent.status.Backup_buffer[4093] = processCurrent.status.Backup_buffer[4093] + 1;
-						processCurrent.status.Current_Location = 4093;
-					}
-					return EEPROM_PREPARE_DataCaseCompleted;
-			}
-			else if(processCurrent.status.Current_Location == 4094) // 3826 - 4080
-			{
-					if(processCurrent.status.Backup_buffer[4094] >= 241) {
-						uint16_t j;
-						for (j = 4079; j <= 4094; j++)
-						{
-							processCurrent.status.Backup_buffer[j] = 0;
-						}
-						processCurrent.status.Backup_buffer[4079] = 1;
-						processCurrent.status.Backup_buffer[0] = processCurrent.status.Backup_buffer[0] + 1;
-						processCurrent.status.Current_Location = 4079;
-						return EEPROM_PREPARE_DataCaseCompleted;
-					} else {
-						processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4093] + processCurrent.status.Backup_buffer[4094]] = processCurrent.status.Backup_buffer[processCurrent.status.Backup_buffer[4094]] + 1;
-						processCurrent.status.Backup_buffer[4094] = processCurrent.status.Backup_buffer[4094] + 1;
-						processCurrent.status.Current_Location = 4094;
-					}
-					return EEPROM_PREPARE_DataCaseCompleted;
-			}
-
-		}
-	}
-
-	return EEPROM_PREPARE_NONE;
+	    return EEPROM_PREPARE_NONE;
 }

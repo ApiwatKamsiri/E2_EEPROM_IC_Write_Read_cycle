@@ -49,7 +49,6 @@ typedef enum {
 typedef enum {
 	EEPROM_PREPARE_NONE = 0,
 	EEPROM_PREPARE_DataCaseCompleted,
-	EEPROM_PREPARE_Completed,
 	EEPROM_PREPARE_Stop,
 } resultPrepareData_em;
 
@@ -63,10 +62,14 @@ typedef struct {
 	uint8_t CommandWrite :1;
 	uint8_t CommandRead :1;
 	uint8_t GetStatusComplete :1;
+	uint8_t AlreadyCommandWrted :1;
 	resultCheckData_em Get_ResultCheckData;
 	resultPrepareData_em Get_ResultPrepareData;
 	uint8_t WriteCycleTime_1s;
 	uint16_t Current_Location;
+	uint8_t EEPROM_ALL_PAGE;
+	uint8_t EEPROM_Cuurent_PAGE;
+	uint16_t EEPROM_Cuurent_Address;
 	uint8_t Current_buffer[EEPROM_PAGE_SIZE];
 	uint8_t Backup_buffer[EEPROM_MAX_ADDR];
 } EepromProcess_st;
