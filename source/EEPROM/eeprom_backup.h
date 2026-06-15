@@ -63,9 +63,13 @@ typedef struct {
 	uint8_t CommandRead :1;
 	uint8_t GetStatusComplete :1;
 	uint8_t AlreadyCommandWrted :1;
+	uint8_t ReadCompleted :1;
+	uint8_t WriteCycle :1;
+	uint8_t ReadCycle :1;
 	resultCheckData_em Get_ResultCheckData;
 	resultPrepareData_em Get_ResultPrepareData;
 	uint8_t WriteCycleTime_1s;
+	uint8_t WriteCycleTime_20ms;
 	uint16_t Current_Location;
 	uint8_t EEPROM_ALL_PAGE;
 	uint8_t EEPROM_Cuurent_PAGE;

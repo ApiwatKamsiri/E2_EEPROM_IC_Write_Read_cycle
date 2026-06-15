@@ -177,7 +177,7 @@ void I2C_Read_Hardware_ISR(void)
 	switch (I2CProcSys.status)
 	{
 		case I2C_STATUS_BUSY_WAITREAD:
-				R_IICA0_StopCondition();	//Stop condition for completed
+				//R_IICA0_StopCondition();	//Stop condition for completed
 				I2CProcSys.status = I2C_STATUS_BUSY_COMPLETED;
 			break;
 
