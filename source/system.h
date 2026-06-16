@@ -38,7 +38,7 @@ typedef struct {
 Define function
 ***********************************************************************************************************************/
 #define CoreSoftwareStock 92740654
-#define CoreSoftwareVersion 00
+#define CoreSoftwareVersion 01
 #define ParameterSoftwareVersion 00
 
 extern void SystemInitState(void);

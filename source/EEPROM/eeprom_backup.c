@@ -152,7 +152,7 @@ void EEPROM1MsTask(void)
 							}
 							else
 							{
-								uint8_t i = 0;
+								uint16_t i = 0;
 
 								if(processCurrent.status.EEPROM_ALL_PAGE)
 								{
@@ -386,7 +386,9 @@ uint8_t EEPROM_Prepare_Task(void)
 	        return EEPROM_PREPARE_DataCaseCompleted;
 	    }
 
-	    return EEPROM_PREPARE_NONE;
+		// Case 4 : Oters case
+		memset(processCurrent.status.Backup_buffer, 0, EEPROM_MAX_ADDR);
+	    return EEPROM_PREPARE_DataCaseCompleted;
 }
 
 uint16_t LastAddressAfterPowerOn(void)
