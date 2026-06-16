@@ -246,6 +246,7 @@ void EEPROM1MsTask(void)
 						break;
 
 					case EEPROM_STATE_GetData:
+							processCurrent.status.Current_Location = LastAddressAfterPowerOn();
 							processCurrent.workstate = EEPROM_STATE_Check;
 						break;
 
@@ -386,4 +387,19 @@ uint8_t EEPROM_Prepare_Task(void)
 	    }
 
 	    return EEPROM_PREPARE_NONE;
+}
+
+uint16_t LastAddressAfterPowerOn(void)
+{
+    uint16_t addr;
+
+    for (addr = 4079; addr <= 4094; addr++)
+    {
+        if (processCurrent.status.Backup_buffer[addr] < 255)
+        {
+            return addr;
+        }
+    }
+
+    return 4079;
 }

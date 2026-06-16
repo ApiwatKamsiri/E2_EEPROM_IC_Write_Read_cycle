@@ -97,6 +97,7 @@ void EEPROM_ReadAll_Task(void);
 void EEPROM_Write_Task(void);
 uint8_t EEPROM_CheckData_Task(void);
 uint8_t EEPROM_Prepare_Task(void);
+uint16_t LastAddressAfterPowerOn(void);
 
 extern void EEPROM1MsTask(void);
 extern void EEPROM10MsTask(void);
