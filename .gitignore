@@ -18,6 +18,11 @@
 *.bak
 *.rsp
 
+# Allow .bat only inside built/scripts
+!built/scripts/*.bat
+!HardwareDebug/*.mot
+!HardwareDebug/*.map
+
 #For E2 studio
 .metadata/
 RemoteSystemsTempFiles/
@@ -27,6 +32,3 @@ RemoteSystemsTempFiles/
 Debug/
 Release/
 HardwareDebug/
-
-# Allow .bat only inside built/scripts
-!built/scripts/*.bat
