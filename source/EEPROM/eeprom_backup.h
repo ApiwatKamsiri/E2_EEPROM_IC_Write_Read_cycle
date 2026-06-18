@@ -11,20 +11,27 @@
 /***********************************************************************************************************************
 Include function
 ***********************************************************************************************************************/
+/* Global variable */
+#include <string.h>
+
+/* Device variable */
 #include "..\\dev\timer.h"
+#include "..\\dev\i2c.h"
 
 #define SLAVE_ADDRESS 160							//160dec -> 0xA0
-#define EEPROM_PAGE_SIZE 32							//Write cycle
 #define START_READ_ADDRESS 0						//Start address for read
 #define EEPROM_SIZE_BYTES_64KB 8192					//EEPROM size 64KB
 #define EEPROM_SIZE_BYTES_32KB 4096					//EEPROM size 32KB
-//#define SELECT64KB									//Define when use 64KBIT
-
+//#define SELECT64KB								//Define when use 64KBIT
 #ifdef SELECT64KB
 #define EEPROM_MAX_ADDR EEPROM_SIZE_BYTES_64KB
 #else
 #define EEPROM_MAX_ADDR EEPROM_SIZE_BYTES_32KB
 #endif
+#define StartWriteTime_set 2
+#define StartDataWrite_location 0
+#define StartDataAddress_location 4079
+#define StartDataCountCycle_set 4095
 
 /***********************************************************************************************************************
 typedef counting function
@@ -61,20 +68,13 @@ typedef struct {
 	uint8_t FirstPlug :1;
 	uint8_t CommandWrite :1;
 	uint8_t CommandRead :1;
-	uint8_t GetStatusComplete :1;
 	uint8_t AlreadyCommandWrted :1;
 	uint8_t ReadCompleted :1;
-	uint8_t WriteCycle :1;
-	uint8_t ReadCycle :1;
 	resultCheckData_em Get_ResultCheckData;
 	resultPrepareData_em Get_ResultPrepareData;
 	uint8_t WriteCycleTime_1s;
 	uint8_t WriteCycleTime_20ms;
 	uint16_t Current_Location;
-	uint16_t EEPROM_ALL_PAGE;
-	uint16_t EEPROM_Cuurent_PAGE;
-	uint16_t EEPROM_Cuurent_Address;
-	uint8_t Current_buffer[EEPROM_PAGE_SIZE];
 	uint8_t Backup_buffer[EEPROM_MAX_ADDR];
 } EepromProcess_st;
 
@@ -84,11 +84,12 @@ typedef struct {
 	EepromProcess_st status;
 } EepromProcessStruct_t;
 
+
 /***********************************************************************************************************************
 Define function
 ***********************************************************************************************************************/
-//Global variable
-extern EepromProcessStruct_t processCurrent;
+/* EEPROM process system variable */
+extern EepromProcessStruct_t EepProcSys;
 
 void EepromBackup_Init(void);
 void EEPROMBackupStateHandler(void);

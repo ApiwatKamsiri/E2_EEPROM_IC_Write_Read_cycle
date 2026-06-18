@@ -11,8 +11,19 @@
 /***********************************************************************************************************************
 Include function
 ***********************************************************************************************************************/
+/* Global variable */
+#include <stddef.h>
+#include "iodefine.h"			//Special complier define
+#include "r_cg_timer.h"			//Timer hardware define
 #include "r_cg_macrodriver.h"
 
+#define Value_1MS 1
+#define Value_10MS 10
+#define Value_20MS 20
+#define Value_100MS 100
+#define Value_1S 1000
+#define Value_1Min 60UL* 1000UL
+#define Value_1Hr 60UL * 60UL * 1000UL
 
 /***********************************************************************************************************************
 typedef counting function
@@ -47,13 +58,14 @@ typedef struct
 /***********************************************************************************************************************
 Define function
 ***********************************************************************************************************************/
-//Global variable
-extern SysTimer_type TimerProcSys;
+/* Timer device system variable */
+extern SysTimer_type TimerDevProcSys;
 
 extern void SysTimer_Init(void);
 extern void SysTimer_Set(SysTimer_Channel_1ms channel, uint32_t durationMs);
 extern void Timer_Hardware_ISR(void);
 extern SysTimer_Channel_1ms SysTimer_GetActiveTimer(void);
+
 extern void SysTimer_1Ms(void);
 extern void SysTimer_10Ms(void);
 extern void SysTimer_20Ms(void);

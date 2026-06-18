@@ -55,7 +55,7 @@ Global variables and functions
 * Arguments    : None
 * Return Value : None
 ***********************************************************************************************************************/
-static void __near r_tau0_channel4_interrupt(void)
+static void __near r_tau0_channel4_interrupt(void) // @suppress("Unused static function")
 {
     /* Start user code. Do not edit comment generated here */
 	//Should be add when created new system

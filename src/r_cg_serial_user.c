@@ -47,7 +47,7 @@ Pragma directive
 Global variables and functions
 ***********************************************************************************************************************/
 extern volatile uint8_t   g_iica0_master_status_flag;  /* iica0 master flag */ 
-extern volatile uint8_t   g_iica0_slave_status_flag;   /* iica0 slave flag */
+extern volatile uint8_t   g_iica0_slave_status_flag;   /* iica0 slave flag */ // @suppress("Unused variable declaration in file scope")
 extern volatile uint8_t * gp_iica0_rx_address;         /* iica0 receive buffer address */
 extern volatile uint16_t  g_iica0_rx_cnt;              /* iica0 receive data length */
 extern volatile uint16_t  g_iica0_rx_len;              /* iica0 receive data count */
@@ -62,7 +62,7 @@ extern volatile uint16_t  g_iica0_tx_cnt;              /* iica0 send data count 
 * Arguments    : None
 * Return Value : None
 ***********************************************************************************************************************/
-static void __near r_iica0_interrupt(void)
+static void __near r_iica0_interrupt(void) // @suppress("Unused static function")
 {
     if ((IICS0 & _80_IICA_STATUS_MASTER) == 0x80U)
     {

@@ -13,31 +13,50 @@ Include
 /***********************************************************************************************************************
 Define function
 ***********************************************************************************************************************/
-static System_Registry_t SysRegistryInstance;
+/* Process system variable */
+System_Registry_t SysProc;
 
-System_Registry_t *SysProc = &SysRegistryInstance;
+
+/***********************************************************************************************************************
+System software version control state
+***********************************************************************************************************************/
+void SystemSoftwareVersionControl(void)
+{
+	/* Stock software control system */
+	SysProc.StockControl.Stock[0] = (((CoreSoftwareStock / 10000) / 10000) % 10000);
+	SysProc.StockControl.Stock[1] = ((CoreSoftwareStock / 10000) % 10000);
+	SysProc.StockControl.Stock[2] = (CoreSoftwareStock % 10000);
+
+	/* Core and Version software control system */
+	SysProc.StockControl.ParameterVersion = ParameterSoftwareVersion;
+	SysProc.StockControl.CoreVersion = CoreSoftwareVersion;
+}
 
 /***********************************************************************************************************************
 Initial state
 ***********************************************************************************************************************/
 void SystemInitState(void)
 {
-	SysProc->SysDev.pTimer = &TimerProcSys;
-	SysProc->SysDev.pI2C = &I2CProcSys;
+	/* Pointer system device process variable */
+	SysProc.SysDev.devTimer = &TimerDevProcSys;
+	SysProc.SysDev.devI2C = &I2CDevProcSys;
 
-	SysProc->SysProcess.pEep = &processCurrent;
+	/* Pointer system process variable */
+	SysProc.SysProcess.processEep = &EepProcSys;
 
-	//Hardware global
+	/* Global hardware initial */
 	R_WDT_Create();			//Initial hardware global watchdog
+	R_PORT_Create();		//Initial hardware port
 
-	//Hardware
+	/* Hardware initial */
 	SysTimer_Init();		//Initial hardware timer
 	SysI2C_Init();			//Initial hardware i2c
 
-	R_PORT_Create();		//ไปเพิ่ม port หำะะรืเ ด้วย
-
-	//Functiuon
+	/* Functiuon initial */
 	EepromBackup_Init();	//Initial eeprom backup
+
+	/* Stock and Version software control */
+	SystemSoftwareVersionControl();
 
 }
 
@@ -46,14 +65,15 @@ System loop state
 ***********************************************************************************************************************/
 void SystemRunState(void)
 {
-	//Global hardware reset watchdog
-	R_WDT_Restart();
+	/* Global hardware state */
+	R_WDT_Restart();				//Watch dog restart
 
-	//Global define Timer
-	SysTimer_GetActiveTimer();
+	/* Device state */
+	SysTimer_GetActiveTimer();		//Timer dev state
 
-	//Global loop
-	EEPROMBackupStateHandler();
+	/* Process state */
+	EEPROMBackupStateHandler();		//Eeprom process state
+
 }
 
 /***********************************************************************************************************************
@@ -61,37 +81,46 @@ System timer loop state
 ***********************************************************************************************************************/
 void SysTimer_1Ms(void)
 {
+	/* Device timer state */
+	SysI2C1MsTask();
+
+	/* Process timer state */
 	EEPROM1MsTask();
 }
 
 void SysTimer_10Ms(void)
 {
-
+	/* Process timer state */
 	EEPROM10MsTask();
 }
 
 void SysTimer_20Ms(void)
 {
+	/* Process timer state */
 	EEPROM20MsTask();
 }
 
 void SysTimer_100Ms(void)
 {
+	/* Process timer state */
 	;
 }
 
 void SysTimer_1SEC(void)
 {
+	/* Process timer state */
 	EEPROM1sTask();
 }
 
 void SysTimer_1MIN(void)
 {
+	/* Process timer state */
 	EEPROM1MINTask();
 }
 
 void SysTimer_1HOUR(void)
 {
+	/* Process timer state */
 	;
 }
 

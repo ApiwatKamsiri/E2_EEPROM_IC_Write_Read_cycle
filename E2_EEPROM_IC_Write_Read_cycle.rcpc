@@ -52,7 +52,9 @@
     <Device Category="com.renesas.cdt.managedbuild.renesas.ccrl.common.option.cpu.s2" Series="RL78">R5F101PH</Device>
     <BuildOptions Name="CC-RL" Version="v1.16.00">
       <BuildMode Active="True" Name="HardwareDebug">
-        <GeneralOptions/>
+        <GeneralOptions>
+          <CommandsAfter>"${workspace_loc:/${ProjName}/scripts/Build_Script_Runner_app.bat}"</CommandsAfter>
+        </GeneralOptions>
         <CompileOptions>
           <Option>-cpu=S2</Option>
           <Option>-c</Option>
