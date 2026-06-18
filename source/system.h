@@ -60,7 +60,7 @@ extern System_Registry_t SysProc;
 
 #define CoreSoftwareStock 92740654
 #define CoreSoftwareVersion 02
-#define ParameterSoftwareVersion 00
+#define ParameterSoftwareVersion 01
 
 extern void SystemInitState(void);
 extern void SystemRunState(void);

@@ -22,7 +22,7 @@ Include function
 #define START_READ_ADDRESS 0						//Start address for read
 #define EEPROM_SIZE_BYTES_64KB 8192					//EEPROM size 64KB
 #define EEPROM_SIZE_BYTES_32KB 4096					//EEPROM size 32KB
-//#define SELECT64KB								//Define when use 64KBIT
+#define SELECT64KB								//Define when use 64KBIT
 #ifdef SELECT64KB
 #define EEPROM_MAX_ADDR EEPROM_SIZE_BYTES_64KB
 #else
