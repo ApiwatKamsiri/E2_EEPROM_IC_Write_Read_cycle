@@ -16,6 +16,7 @@
       </Category>
       <Category Name="generate">
         <Path>generate\cstart.asm</Path>
+        <Path>generate\hdwinit.asm</Path>
         <Path>generate\iodefine.h</Path>
         <Path>generate\stkinit.asm</Path>
       </Category>
@@ -25,6 +26,7 @@
         <Category Name="EEPROM">
           <Path>source\EEPROM\eeprom_backup.c</Path>
           <Path>source\EEPROM\eeprom_backup.h</Path>
+          <Path>source\EEPROM\eeprom_config.h</Path>
         </Category>
       </Category>
       <Category Name="src">
@@ -58,7 +60,7 @@
         <CompileOptions>
           <Option>-cpu=S2</Option>
           <Option>-c</Option>
-          <Option>-dev="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-dev="C:/Users/92740654/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-I "${ProjDirPath}\generate"</Option>
           <Option>-I "${ProjDirPath}\src"</Option>
           <Option>-I "${ProjDirPath}\source"</Option>
@@ -71,13 +73,13 @@
         <AssembleOptions>
           <Option>-cpu=S2</Option>
           <Option>-c</Option>
-          <Option>-dev="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-dev="C:/Users/92740654/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-character_set=utf8</Option>
           <Option>-g</Option>
           <Option>-o "${ProjDirPath}\${ConfigName}"</Option>
         </AssembleOptions>
         <LinkOptions>
-          <Option>-device="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-device="C:/Users/92740654/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-list</Option>
           <Option>-show=symbol</Option>
           <Option>-nooptimize</Option>
@@ -130,6 +132,7 @@
           <Path>HardwareDebug\r_systeminit.obj</Path>
           <Path>HardwareDebug\E2_EEPROM_IC_Write_Read_cycle.lib</Path>
         </LinkOrder>
+        <NoTargetFile Target="generate\hdwinit.asm"/>
         <CommonOptions>
           <IncludePathForC>"${ProjDirPath}\generate"</IncludePathForC>
           <IncludePathForC>"${ProjDirPath}\src"</IncludePathForC>
@@ -142,7 +145,7 @@
         <CompileOptions>
           <Option>-cpu=S2</Option>
           <Option>-c</Option>
-          <Option>-dev="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-dev="C:/Users/92740654/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-I "${ProjDirPath}\generate"</Option>
           <Option>-I "${ProjDirPath}\src"</Option>
           <Option>-character_set=utf8</Option>
@@ -153,13 +156,13 @@
         <AssembleOptions>
           <Option>-cpu=S2</Option>
           <Option>-c</Option>
-          <Option>-dev="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-dev="C:/Users/92740654/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-character_set=utf8</Option>
           <Option>-g</Option>
           <Option>-o "${ProjDirPath}\${ConfigName}"</Option>
         </AssembleOptions>
         <LinkOptions>
-          <Option>-device="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-device="C:/Users/92740654/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-list</Option>
           <Option>-show=symbol</Option>
           <Option>-nooptimize</Option>
@@ -206,6 +209,7 @@
         </LinkOrder>
         <NoTargetFile Target="dev\i2c.c"/>
         <NoTargetFile Target="dev\timer.c"/>
+        <NoTargetFile Target="generate\hdwinit.asm"/>
         <NoTargetFile Target="source\EEPROM\eeprom_backup.c"/>
         <NoTargetFile Target="source\system.c"/>
         <CommonOptions>
@@ -218,7 +222,7 @@
         <CompileOptions>
           <Option>-cpu=S2</Option>
           <Option>-c</Option>
-          <Option>-dev="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-dev="C:/Users/92740654/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-I "${ProjDirPath}\generate"</Option>
           <Option>-I "${ProjDirPath}\src"</Option>
           <Option>-character_set=utf8</Option>
@@ -228,12 +232,12 @@
         <AssembleOptions>
           <Option>-cpu=S2</Option>
           <Option>-c</Option>
-          <Option>-dev="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-dev="C:/Users/92740654/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-character_set=utf8</Option>
           <Option>-o "${ProjDirPath}\${ConfigName}"</Option>
         </AssembleOptions>
         <LinkOptions>
-          <Option>-device="C:/Users/92740654.AR-ARCELIK/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
+          <Option>-device="C:/Users/92740654/.eclipse/com.renesas.platform_1435879475/DebugComp/RL78/RL78/Common/DR5F101PH.DVF"</Option>
           <Option>-list</Option>
           <Option>-show=symbol</Option>
           <Option>-nooptimize</Option>
@@ -279,6 +283,7 @@
         </LinkOrder>
         <NoTargetFile Target="dev\i2c.c"/>
         <NoTargetFile Target="dev\timer.c"/>
+        <NoTargetFile Target="generate\hdwinit.asm"/>
         <NoTargetFile Target="source\EEPROM\eeprom_backup.c"/>
         <NoTargetFile Target="source\system.c"/>
         <CommonOptions>

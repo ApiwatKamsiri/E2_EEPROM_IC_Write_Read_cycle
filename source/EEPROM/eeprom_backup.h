@@ -13,25 +13,28 @@ Include function
 ***********************************************************************************************************************/
 /* Global variable */
 #include <string.h>
+#include "eeprom_config.h"
 
 /* Device variable */
 #include "..\\dev\timer.h"
 #include "..\\dev\i2c.h"
 
-#define SLAVE_ADDRESS 160							//160dec -> 0xA0
-#define START_READ_ADDRESS 0						//Start address for read
-#define EEPROM_SIZE_BYTES_64KB 8192					//EEPROM size 64KB
-#define EEPROM_SIZE_BYTES_32KB 4096					//EEPROM size 32KB
-#define SELECT64KB								//Define when use 64KBIT
-#ifdef SELECT64KB
-#define EEPROM_MAX_ADDR EEPROM_SIZE_BYTES_64KB
-#else
-#define EEPROM_MAX_ADDR EEPROM_SIZE_BYTES_32KB
-#endif
+#define SLAVE_ADDRESS EEPROM_SLAVE_BASE				//160dec -> 0xA0
+#define START_READ_ADDRESS 0u						//Start address for read
+
+#define EEPROM_MAX_ADDR EEPROM_SIZE_BYTES
+
+#if   (EEPROM_TYPE == EEPROM_16kbit)
+#define StartWriteTime_set 2
+#define StartDataWrite_location 0
+#define StartDataAddress_location 2039
+#define StartDataCountCycle_set 2047
+#elif (EEPROM_TYPE == EEPROM_32kbit) || (EEPROM_TYPE == EEPROM_64kbit)
 #define StartWriteTime_set 2
 #define StartDataWrite_location 0
 #define StartDataAddress_location 4079
 #define StartDataCountCycle_set 4095
+#endif
 
 /***********************************************************************************************************************
 typedef counting function
@@ -75,7 +78,7 @@ typedef struct {
 	uint8_t WriteCycleTime_1s;
 	uint8_t WriteCycleTime_20ms;
 	uint16_t Current_Location;
-	uint8_t Backup_buffer[EEPROM_MAX_ADDR];
+	uint8_t Backup_buffer[EEPROM_MAX_ADDR]; // @suppress("Symbol is not resolved")
 } EepromProcess_st;
 
 typedef struct {

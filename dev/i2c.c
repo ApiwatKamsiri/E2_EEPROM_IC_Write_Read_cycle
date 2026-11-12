@@ -16,9 +16,38 @@ Define function
 SysI2C_type I2CDevProcSys;
 
 /* Buffer I2C device system variable */
-static uint8_t dev_i2c_tx_buffer[32 + 2];	// Buffer for write data from EEPROM
-static uint8_t dev_i2c_tx_rx_buffer[2];		// Buffer for read data from EEPROM
+static uint8_t dev_i2c_tx_buffer[EEPROM_PAGE_SIZE + EEPROM_ADDR_BYTES];
+static uint8_t dev_i2c_tx_rx_buffer[EEPROM_ADDR_BYTES];
 
+static uint8_t I2C_SlaveFor(uint8_t base, uint16_t mem_addr)
+{
+#if (EEPROM_ADDR_BYTES == 1u)
+	return (uint8_t)(base | ((mem_addr >> 7) & 0x0Eu));
+#else
+	(void)mem_addr;
+	return base;
+#endif
+}
+
+static uint8_t I2C_FillMemAddr(uint8_t *buf, uint16_t mem_addr)
+{
+#if (EEPROM_ADDR_BYTES == 1u)
+	buf[0] = (uint8_t)(mem_addr & 0xFFu);
+	return 1u;
+#else
+	buf[0] = (uint8_t)(mem_addr >> 8);
+	buf[1] = (uint8_t)(mem_addr & 0xFFu);
+	return 2u;
+#endif
+}
+
+static uint16_t I2C_CalcPages(uint16_t start, uint16_t len)
+{
+	uint16_t first = EEPROM_PAGE_SIZE - (start % EEPROM_PAGE_SIZE);
+	if (len <= first) return 1u;
+	len -= first;
+	return (uint16_t)(1u + (len + EEPROM_PAGE_SIZE - 1u) / EEPROM_PAGE_SIZE);
+}
 
 /***********************************************************************************************************************
 System i2c initial function
@@ -51,21 +80,14 @@ uint8_t SysI2C_Dev_Write(uint8_t slave_addr, uint16_t mem_addr, uint8_t *data, u
 
 		case I2C_STATUS_IDLE:
 					/* Variable the data */
-					I2CDevProcSys.slave_addr = slave_addr;
-					I2CDevProcSys.start_addr = mem_addr;
-					I2CDevProcSys.buffer = data;
-					I2CDevProcSys.all_page = 0;
-					I2CDevProcSys.current_page = 0;
-					I2CDevProcSys.wait = 0xFF;
+					I2CDevProcSys.slave_addr        = slave_addr;
+					I2CDevProcSys.start_addr        = mem_addr;
+					I2CDevProcSys.total_len         = len;
+					I2CDevProcSys.buffer            = data;
 					I2CDevProcSys.transmitted_bytes = 0;
-
-					/* Prepare page */
-					I2CDevProcSys.all_page = len/I2C_PAGE_SIZE;
-
-					if ((len % I2C_PAGE_SIZE) != 0)
-					{
-						I2CDevProcSys.all_page++;
-					}
+					I2CDevProcSys.current_page      = 0;
+					I2CDevProcSys.all_page          = I2C_CalcPages(mem_addr, len); /* ไว้ debug */
+					I2CDevProcSys.wait              = 0xFF;
 
 					/* Change state to send address */
 					I2CDevProcSys.status = I2C_STATUS_Preparing;
@@ -73,36 +95,37 @@ uint8_t SysI2C_Dev_Write(uint8_t slave_addr, uint16_t mem_addr, uint8_t *data, u
 
 		case I2C_STATUS_Preparing:
 					/* Prepare the data */
-					if(I2CDevProcSys.current_page < I2CDevProcSys.all_page)
-			        {
-			            I2CDevProcSys.current_addr = I2CDevProcSys.start_addr + (I2CDevProcSys.current_page * I2C_PAGE_SIZE);
+					{
+						uint16_t remain, room, send_size;
+						uint8_t  hdr;
 
-			            send_size = I2C_PAGE_SIZE;
-			            if ((I2CDevProcSys.current_page == I2CDevProcSys.all_page - 1) && ((len % I2C_PAGE_SIZE) != 0))
-			            {
-			                send_size = len % I2C_PAGE_SIZE;
-			            }
+						remain = I2CDevProcSys.total_len - I2CDevProcSys.transmitted_bytes;
+						if (remain == 0u)
+						{
+							I2CDevProcSys.status = I2C_STATUS_BUSY_COMPLETED;
+							return I2CDevProcSys.status;
+						}
 
-			            dev_i2c_tx_buffer[0] = (uint8_t)(I2CDevProcSys.current_addr >> 8);
-			            dev_i2c_tx_buffer[1] = (uint8_t)(I2CDevProcSys.current_addr);
+						I2CDevProcSys.current_addr = I2CDevProcSys.start_addr + I2CDevProcSys.transmitted_bytes;
 
-			            for(i = 0; i < send_size; i++)
-			            {
-			                dev_i2c_tx_buffer[2 + i] = I2CDevProcSys.buffer[I2CDevProcSys.transmitted_bytes + i];
-			            }
+						room      = EEPROM_PAGE_SIZE - (I2CDevProcSys.current_addr % EEPROM_PAGE_SIZE);
+						send_size = (remain < room) ? remain : room;
 
-			            I2CDevProcSys.transmitted_bytes += send_size;
-			            I2CDevProcSys.current_page++;
+						I2CDevProcSys.cur_slave = I2C_SlaveFor(I2CDevProcSys.slave_addr, I2CDevProcSys.current_addr);
+						hdr = I2C_FillMemAddr(dev_i2c_tx_buffer, I2CDevProcSys.current_addr);
+						memcpy(&dev_i2c_tx_buffer[hdr],&I2CDevProcSys.buffer[I2CDevProcSys.transmitted_bytes], send_size);
 
-			            I2CDevProcSys.length = send_size + 2;
+						I2CDevProcSys.length = hdr + send_size;
+						I2CDevProcSys.transmitted_bytes += send_size;
+						I2CDevProcSys.current_page++;
+						I2CDevProcSys.status = I2C_STATUS_BUSY_SEND;
 
-			            I2CDevProcSys.status = I2C_STATUS_BUSY_SEND;
-			        }
 					return I2CDevProcSys.status;
+					}
 
 		case I2C_STATUS_BUSY_SEND:
 					/* Start send and Change state to waiting */
-					R_IICA0_Master_Send(I2CDevProcSys.slave_addr, dev_i2c_tx_buffer, I2CDevProcSys.length, 5);
+					R_IICA0_Master_Send(I2CDevProcSys.cur_slave, dev_i2c_tx_buffer, I2CDevProcSys.length, 5);
 
 					I2CDevProcSys.status = I2C_STATUS_BUSY_WAIT;
 				return I2C_STATUS_BUSY_WAIT;
@@ -113,14 +136,11 @@ uint8_t SysI2C_Dev_Write(uint8_t slave_addr, uint16_t mem_addr, uint8_t *data, u
 
 		case I2C_STATUS_BUSY_CHECKDATA:
 					/* Check page is completed or not */
-					if(I2CDevProcSys.wait >= 5)
+					if (I2CDevProcSys.wait >= EEPROM_WRITE_CYCLE_MS)
 					{
 						I2CDevProcSys.wait = 0;
-
-						if(I2CDevProcSys.current_page < I2CDevProcSys.all_page)
-							I2CDevProcSys.status = I2C_STATUS_Preparing;
-						else
-							I2CDevProcSys.status = I2C_STATUS_BUSY_COMPLETED;
+						I2CDevProcSys.status = (I2CDevProcSys.transmitted_bytes < I2CDevProcSys.total_len)
+											   ? I2C_STATUS_Preparing : I2C_STATUS_BUSY_COMPLETED;
 					}
 
 				return I2CDevProcSys.status;
@@ -162,8 +182,16 @@ uint8_t SysI2C_Dev_Read(uint8_t slave_addr, uint16_t mem_addr, uint8_t *data, ui
 
 		case I2C_STATUS_Preparing:
 					/* Prepare the data */
+#if (EEPROM_ADDR_BYTES == 1u)
+					/* 1 byte address (2k-16kbit) : A10..A8 in slave address bit3..1 */
+					I2CDevProcSys.cur_slave = (uint8_t)(I2CDevProcSys.slave_addr | ((I2CDevProcSys.start_addr >> 7) & 0x0Eu));
+					dev_i2c_tx_rx_buffer[0] = (uint8_t)(I2CDevProcSys.start_addr);
+#else
+					/* 2 byte address (32kbit up) */
+					I2CDevProcSys.cur_slave = I2CDevProcSys.slave_addr;
 					dev_i2c_tx_rx_buffer[0] = (uint8_t)(I2CDevProcSys.start_addr >> 8);
 					dev_i2c_tx_rx_buffer[1] = (uint8_t)(I2CDevProcSys.start_addr);
+#endif
 
 					/* Change state to send address */
 					I2CDevProcSys.status = I2C_STATUS_BUSY_SENDFORREAD;
@@ -171,7 +199,7 @@ uint8_t SysI2C_Dev_Read(uint8_t slave_addr, uint16_t mem_addr, uint8_t *data, ui
 
 		case I2C_STATUS_BUSY_SENDFORREAD:
 					/* Start send and Change state to waiting */
-					R_IICA0_Master_Send(I2CDevProcSys.slave_addr, dev_i2c_tx_rx_buffer, sizeof(dev_i2c_tx_rx_buffer), 5);
+					R_IICA0_Master_Send(I2CDevProcSys.cur_slave, dev_i2c_tx_rx_buffer, sizeof(dev_i2c_tx_rx_buffer), 5);
 
 					/* Change state to send address */
 					I2CDevProcSys.status = I2C_STATUS_BUSY_WAITREADWRITE;
@@ -183,7 +211,7 @@ uint8_t SysI2C_Dev_Read(uint8_t slave_addr, uint16_t mem_addr, uint8_t *data, ui
 
 		case I2C_STATUS_BUSY_RECEIVE:
 					/* Start read and Change state to waiting */
-					R_IICA0_Master_Receive(I2CDevProcSys.slave_addr, I2CDevProcSys.buffer, I2CDevProcSys.length, 5);
+					R_IICA0_Master_Receive(I2CDevProcSys.cur_slave, I2CDevProcSys.buffer, I2CDevProcSys.length, 5);
 
 					/* Change state to send address */
 					I2CDevProcSys.status = I2C_STATUS_BUSY_WAITREAD;
@@ -249,7 +277,7 @@ void I2C_Read_Hardware_ISR(void)
 	switch (I2CDevProcSys.status)
 	{
 		case I2C_STATUS_BUSY_WAITREAD:
-				//R_IICA0_StopCondition();	//Stop condition for completed
+				R_IICA0_StopCondition();	//Stop condition for completed
 				I2CDevProcSys.status = I2C_STATUS_BUSY_CHECKDATA;
 			break;
 

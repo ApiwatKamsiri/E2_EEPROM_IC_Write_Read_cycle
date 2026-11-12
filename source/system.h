@@ -59,8 +59,8 @@ Define function
 extern System_Registry_t SysProc;
 
 #define CoreSoftwareStock 92740654
-#define CoreSoftwareVersion 02
-#define ParameterSoftwareVersion 01
+#define CoreSoftwareVersion 03			//Update new EEPROM size support
+#define ParameterSoftwareVersion 02		//Update new method record
 
 extern void SystemInitState(void);
 extern void SystemRunState(void);

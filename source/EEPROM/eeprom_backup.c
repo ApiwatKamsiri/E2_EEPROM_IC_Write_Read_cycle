@@ -251,7 +251,7 @@ uint8_t EEPROM_CheckData_Task(void)
 {
 		uint16_t i;
 
-		for(i = 4079; i <= 4095; i++)
+		for(i = StartDataAddress_location; i <= StartDataCountCycle_set; i++)
 		{
 			if(EepProcSys.status.Backup_buffer[i] != 0)
 				return EEPROM_CheckData_NONE;
@@ -281,7 +281,7 @@ uint8_t EEPROM_Prepare_Task(void)
 	loc = EepProcSys.status.Current_Location;
 
 	// Case 2 : The data is full (Reset and set Backup buffer)
-	if (EepProcSys.status.Backup_buffer[4078] == 255)
+	if (EepProcSys.status.Backup_buffer[StartDataAddress_location - 1] == 255)
 	    {
 	        memset(EepProcSys.status.Backup_buffer, 0, EEPROM_MAX_ADDR - 1);
 
@@ -294,15 +294,15 @@ uint8_t EEPROM_Prepare_Task(void)
 	    }
 
 	// Case 3 : Normal operation
-	if (loc >= 4079 && loc <= 4094)
+	if (loc >= StartDataAddress_location && loc <= (StartDataCountCycle_set - 1))
 	    {
-			if(EepProcSys.status.Backup_buffer[4094] > 253)
+			if(EepProcSys.status.Backup_buffer[(StartDataCountCycle_set - 1)] > 253)
 			{
-				for(j = 4079; j <= loc; j++)
+				for(j = StartDataAddress_location; j <= loc; j++)
 				{
 					EepProcSys.status.Backup_buffer[j] = 0;
 				}
-				EepProcSys.status.Current_Location = 4079;
+				EepProcSys.status.Current_Location = StartDataAddress_location;
 				write_idx = 0;
 				EepProcSys.status.Backup_buffer[write_idx]++;
 				EepProcSys.status.Backup_buffer[EepProcSys.status.Current_Location] = 1;
@@ -312,7 +312,7 @@ uint8_t EEPROM_Prepare_Task(void)
 	        {
 	            prev_sum = 0;
 
-	            for(j = 4079; j < loc; j++) {
+	            for(j = StartDataAddress_location; j < loc; j++) {
 	                prev_sum += EepProcSys.status.Backup_buffer[j];
 	            }
 	            write_idx = prev_sum + EepProcSys.status.Backup_buffer[loc];
@@ -325,7 +325,7 @@ uint8_t EEPROM_Prepare_Task(void)
 	        {
 	            prev_sum = 0;
 
-	            for(j = 4079; j < loc; j++) {
+	            for(j = StartDataAddress_location; j < loc; j++) {
 	                prev_sum += EepProcSys.status.Backup_buffer[j];
 	            }
 	            write_idx = prev_sum + EepProcSys.status.Backup_buffer[loc];
@@ -346,7 +346,7 @@ uint16_t LastAddressAfterPowerOn(void)
 {
     uint16_t addr;
 
-    for (addr = 4079; addr <= 4094; addr++)
+    for (addr = StartDataAddress_location; addr <= (StartDataCountCycle_set - 1); addr++)
     {
         if (EepProcSys.status.Backup_buffer[addr] < 255)
         {
